@@ -8,8 +8,7 @@ import ReportIssue from "./pages/ReportIssue";
 
 function App() {
   return (
-    <BrowserRouter>
-
+    <BrowserRouter basename="/campus-pulse">
       <Routes>
 
         <Route
