@@ -1,14 +1,36 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../supabase";
 import "../App.css";
-
 function Register() {
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    navigate("/dashboard");
-  };
+  const handleRegister = async (e) => {
+  e.preventDefault();
 
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: name,
+        student_id: studentId,
+      },
+    },
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Registration Successful! Please check your email to verify your account.");
+  navigate("/login");
+};
   return (
     <div className="auth-page">
 
@@ -67,6 +89,8 @@ function Register() {
               <input
                 type="text"
                 placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -78,8 +102,10 @@ function Register() {
               <input
                 type="email"
                 placeholder="you@college.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-              />
+             />
             </div>
 
 
@@ -89,8 +115,10 @@ function Register() {
               <input
                 type="text"
                 placeholder="Enter your student ID"
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
                 required
-              />
+               />
             </div>
 
 
@@ -100,6 +128,8 @@ function Register() {
               <input
                 type="password"
                 placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>

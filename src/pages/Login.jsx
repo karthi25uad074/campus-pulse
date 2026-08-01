@@ -1,13 +1,29 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../supabase";
 import "../App.css";
 
 function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    navigate("/dashboard");
-  };
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Login Successful!");
+  navigate("/dashboard");
+};
 
   return (
     <div className="auth-page">
@@ -63,11 +79,13 @@ function Login() {
 
             <div className="input-group">
               <label>Email address</label>
-              <input
+             <input
                 type="email"
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-              />
+             />
             </div>
 
 
@@ -80,6 +98,8 @@ function Login() {
               <input
                 type="password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
