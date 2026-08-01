@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -8,7 +7,7 @@ import ReportIssue from "./pages/ReportIssue";
 
 function App() {
   return (
-    <BrowserRouter basename="/campus-pulse">
+    <HashRouter basename="/campus-pulse">
       <Routes>
 
         <Route
@@ -37,7 +36,7 @@ function App() {
 
       </Routes>
 
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
