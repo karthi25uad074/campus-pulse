@@ -7,7 +7,7 @@ import ReportIssue from "./pages/ReportIssue";
 
 function App() {
   return (
-    <HashRouter basename="/campus-pulse">
+    <HashRouter>
       <Routes>
 
         <Route
