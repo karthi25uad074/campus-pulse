@@ -1,7 +1,48 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 import "../App.css";
-
 function ReportIssue() {
+  const navigate = useNavigate();
+
+const [title, setTitle] = useState("");
+const [category, setCategory] = useState("");
+const [priority, setPriority] = useState("");
+const [description, setDescription] = useState("");
+const [building, setBuilding] = useState("");
+const [floor, setFloor] = useState("");
+const [location, setLocation] = useState("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    alert("Please login first.");
+    return;
+  }
+
+  const { error } = await supabase.from("issues").insert([
+    {
+      title,
+      description,
+      category,
+      priority,
+      location: `${building} ${floor} ${location}`,
+      user_id: user.id,
+    },
+  ]);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Issue reported successfully!");
+  navigate("/dashboard");
+};
   return (
     <div className="report-page">
 
@@ -38,8 +79,7 @@ function ReportIssue() {
         </div>
 
 
-        <form className="report-form">
-
+        <form className="report-form" onSubmit={handleSubmit}>
 
           {/* ISSUE DETAILS */}
 
