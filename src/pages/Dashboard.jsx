@@ -164,7 +164,7 @@ console.log(issues);
             </div>
 
 
-           {issues.length === 0 ? (
+          {issues.length === 0 ? (
   <div className="empty-reports">
     <div className="empty-icon">+</div>
 
@@ -177,27 +177,29 @@ console.log(issues);
     </Link>
   </div>
 ) : (
-  <div key={issue.id} className="report-card">
+  <div className="reports-list">
+    {issues.map((issue) => (
+      <div key={issue.id} className="report-card">
 
-  <h3>{issue.title}</h3>
+        <h3>{issue.title}</h3>
 
-  <p>{issue.description}</p>
+        <p>{issue.description}</p>
 
-  <p><strong>Category:</strong> {issue.category}</p>
+        <p><strong>Category:</strong> {issue.category}</p>
 
-  <p><strong>Priority:</strong> {issue.priority}</p>
+        <p><strong>Priority:</strong> {issue.priority}</p>
 
-  <p><strong>Location:</strong> {issue.location}</p>
+        <p><strong>Location:</strong> {issue.location}</p>
 
-  <div className="report-card-footer">
+        <div className="report-card-footer">
+          <span className="report-status">
+            {issue.status}
+          </span>
+        </div>
 
-    <span className="report-status">
-      {issue.status}
-    </span>
-
+      </div>
+    ))}
   </div>
-
-</div>
 )}
 
           </section>
