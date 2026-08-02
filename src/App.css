@@ -2253,3 +2253,15 @@ footer > p {
   color: inherit;
   cursor: pointer;
 }
+.nav-links button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: inherit;
+  font-weight: 500;
+}
+
+.nav-links button:hover {
+  color: #2563eb;
+}

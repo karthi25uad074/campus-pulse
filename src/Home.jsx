@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 import "./App.css";
 function Home() {
+  const scrollToSection = (id) => {
+  document.getElementById(id)?.scrollIntoView({
+    behavior: "smooth",
+  });
+};
   return (
     <div className="app">
 
@@ -11,12 +16,19 @@ function Home() {
           <span>Campus<span className="logo-highlight">Pulse</span></span>
         </div>
 
-        <div className="nav-links">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#about">About</a>
-        </div>
+       <div className="nav-links">
+  <button onClick={() => scrollToSection("features")}>
+    Features
+  </button>
 
+  <button onClick={() => scrollToSection("how-it-works")}>
+    How It Works
+  </button>
+
+  <button onClick={() => scrollToSection("about")}>
+    About
+  </button>
+</div>
         <div className="nav-buttons">
           <Link to="/login" className="login-btn">
         Login
@@ -50,9 +62,9 @@ function Home() {
           </p>
 
           <div className="hero-buttons">
-            <button className="primary-btn">
-              Report an Issue →
-            </button>
+            <Link to="/register" className="primary-btn">
+                Report an Issue →
+            </Link>
 
             <button className="secondary-btn">
               Explore Campus
@@ -316,9 +328,9 @@ function Home() {
             Build a better campus together.
           </p>
 
-          <button className="cta-button">
+         <Link to="/register" className="cta-button">
             Get Started →
-          </button>
+         </Link>
         </div>
 
       </section>
