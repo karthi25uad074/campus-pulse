@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ReportIssue from "./pages/ReportIssue";
+import MyReports from "./pages/MyReports";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           path="/report"
           element={<ReportIssue />}
         />
+        <Route path="/my-reports" element={<MyReports />} />
 
       </Routes>
 

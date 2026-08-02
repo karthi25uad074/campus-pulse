@@ -27,9 +27,9 @@ function Sidebar() {
           Report Issue
         </Link>
 
-        <Link to="/reports" className="sidebar-link">
+        <Link to="/my-reports" className="sidebar-link">
           <span>▤</span>
-          My Reports
+           My Reports
         </Link>
 
 
