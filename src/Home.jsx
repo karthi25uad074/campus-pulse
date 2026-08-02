@@ -332,14 +332,14 @@ function Home() {
             your campus.
           </h2>
 
-          <p>
-            Report a problem. Track the solution.
-            Build a better campus together.
+          <p style={{ marginBottom: "30px" }}>
+             Report a problem. Track the solution.
+             Build a better campus together.
           </p>
 
-         <Link to="/register" className="cta-button">
-            Get Started →
-         </Link>
+          <Link to="/register" className="cta-button">
+              Get Started →
+          </Link>
         </div>
 
       </section>
