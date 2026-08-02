@@ -2269,3 +2269,58 @@ footer > p {
 .nav-links button:hover {
   color: #2563eb;
 }
+.reports-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.report-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  border: 1px solid #e8edf7;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.report-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+}
+
+.report-card h3 {
+  font-size: 20px;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.report-card p {
+  margin: 8px 0;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.report-card strong {
+  color: #0f172a;
+}
+
+.report-status {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #fff7e6;
+  color: #d97706;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.report-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}

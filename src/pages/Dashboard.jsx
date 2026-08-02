@@ -7,6 +7,15 @@ import "../App.css";
 
 function Dashboard() {
   const [issues, setIssues] = useState([]);
+  const totalReports = issues.length;
+
+const inProgressReports = issues.filter(
+  (issue) => issue.status === "In Progress"
+).length;
+
+const resolvedReports = issues.filter(
+  (issue) => issue.status === "Resolved"
+).length;
   useEffect(() => {
   const fetchIssues = async () => {
     const {
@@ -76,7 +85,7 @@ console.log(issues);
 
               <div>
                 <span>Total Reports</span>
-                <strong>—</strong>
+                <strong>{totalReports}</strong>
               </div>
 
               <small>Your submitted reports</small>
@@ -92,7 +101,7 @@ console.log(issues);
 
               <div>
                 <span>In Progress</span>
-                <strong>—</strong>
+                <strong>{inProgressReports}</strong>
               </div>
 
               <small>Reports being handled</small>
@@ -108,7 +117,7 @@ console.log(issues);
 
               <div>
                 <span>Resolved</span>
-                <strong>—</strong>
+                <strong>{resolvedReports}</strong>
               </div>
 
               <small>Successfully resolved</small>
@@ -124,7 +133,7 @@ console.log(issues);
 
               <div>
                 <span>Impact Score</span>
-                <strong>—</strong>
+                <strong>{resolvedReports * 10}</strong>
               </div>
 
               <small>Your contribution</small>
@@ -168,33 +177,27 @@ console.log(issues);
     </Link>
   </div>
 ) : (
-  <div className="reports-list">
-    {issues.map((issue) => (
-      <div key={issue.id} className="report-card">
+  <div key={issue.id} className="report-card">
 
-        <h3>{issue.title}</h3>
+  <h3>{issue.title}</h3>
 
-        <p>{issue.description}</p>
+  <p>{issue.description}</p>
 
-        <p>
-          <strong>Category:</strong> {issue.category}
-        </p>
+  <p><strong>Category:</strong> {issue.category}</p>
 
-        <p>
-          <strong>Priority:</strong> {issue.priority}
-        </p>
+  <p><strong>Priority:</strong> {issue.priority}</p>
 
-        <p>
-          <strong>Status:</strong> {issue.status}
-        </p>
+  <p><strong>Location:</strong> {issue.location}</p>
 
-        <p>
-          <strong>Location:</strong> {issue.location}
-        </p>
+  <div className="report-card-footer">
 
-      </div>
-    ))}
+    <span className="report-status">
+      {issue.status}
+    </span>
+
   </div>
+
+</div>
 )}
 
           </section>
