@@ -155,23 +155,47 @@ console.log(issues);
             </div>
 
 
-            <div className="empty-reports">
+           {issues.length === 0 ? (
+  <div className="empty-reports">
+    <div className="empty-icon">+</div>
 
-              <div className="empty-icon">
-                +
-              </div>
+    <h3>No reports yet</h3>
 
-              <h3>No reports yet</h3>
+    <p>You haven't reported any campus issues yet.</p>
 
-              <p>
-                You haven't reported any campus issues yet.
-              </p>
+    <Link to="/report" className="empty-report-btn">
+      Report an Issue
+    </Link>
+  </div>
+) : (
+  <div className="reports-list">
+    {issues.map((issue) => (
+      <div key={issue.id} className="report-card">
 
-             <Link to="/report" className="empty-report-btn">
-               Report an Issue
-             </Link>
+        <h3>{issue.title}</h3>
 
-            </div>
+        <p>{issue.description}</p>
+
+        <p>
+          <strong>Category:</strong> {issue.category}
+        </p>
+
+        <p>
+          <strong>Priority:</strong> {issue.priority}
+        </p>
+
+        <p>
+          <strong>Status:</strong> {issue.status}
+        </p>
+
+        <p>
+          <strong>Location:</strong> {issue.location}
+        </p>
+
+      </div>
+    ))}
+  </div>
+)}
 
           </section>
 
