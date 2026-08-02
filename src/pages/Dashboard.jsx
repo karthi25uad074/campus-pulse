@@ -1,9 +1,37 @@
 import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 import "../App.css";
 
 function Dashboard() {
+  const [issues, setIssues] = useState([]);
+  useEffect(() => {
+  const fetchIssues = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("issues")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setIssues(data);
+  };
+
+  fetchIssues();
+}, []);
+console.log(issues);
   return (
     <div className="dashboard-layout">
 
