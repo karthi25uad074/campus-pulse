@@ -2,10 +2,19 @@ import { Link } from "react-router-dom";
 import "./App.css";
 function Home() {
   const scrollToSection = (id) => {
-  document.getElementById(id)?.scrollIntoView({
-    behavior: "smooth",
-  });
-};
+    const element = document.getElementById(id);
+
+    if (element) {
+      const offset = 90; // Navbar height
+      const top =
+        element.getBoundingClientRect().top + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top,
+        behavior: "smooth",
+      });
+    }
+  };
   return (
     <div className="app">
 

@@ -88,14 +88,18 @@ a {
   margin-left: 80px;
 }
 
-.nav-links a {
+.nav-links button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 500;
   color: #667085;
   transition: 0.2s ease;
+  padding: 0;
 }
 
-.nav-links a:hover {
+.nav-links button:hover {
   color: #2563eb;
 }
 
@@ -722,7 +726,7 @@ footer > p {
    RESPONSIVE
 ========================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 768px) {
   .nav-links {
     display: none;
   }
