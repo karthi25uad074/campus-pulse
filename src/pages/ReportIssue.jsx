@@ -85,175 +85,200 @@ const handleSubmit = async (e) => {
 
           <section className="form-card">
 
-            <div className="form-card-title">
+  <div className="form-card-title">
 
-              <div className="form-number">
-                01
-              </div>
+    <div className="form-number">
+      01
+    </div>
 
-              <div>
-                <h2>Issue Details</h2>
+    <div>
+      <h2>Issue Details</h2>
+      <p>
+        Tell us about the problem you noticed.
+      </p>
+    </div>
 
-                <p>
-                  Tell us about the problem you noticed.
-                </p>
-              </div>
-
-            </div>
-
-
-            <div className="form-grid">
-
-              <div className="form-field full">
-
-                <label>
-                  Issue title
-                  <span>*</span>
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Example: Broken classroom fan"
-                />
-
-              </div>
+  </div>
 
 
-              <div className="form-field">
+  <div className="form-grid">
 
-                <label>
-                  Category
-                  <span>*</span>
-                </label>
+    <div className="form-field full">
 
-                <select defaultValue="">
-                  <option value="" disabled>
-                    Select a category
-                  </option>
+      <label>
+        Issue title
+        <span>*</span>
+      </label>
 
-                  <option>Infrastructure</option>
-                  <option>Electrical</option>
-                  <option>Plumbing</option>
-                  <option>Cleanliness</option>
-                  <option>Safety</option>
-                  <option>Internet & Wi-Fi</option>
-                  <option>Other</option>
-                </select>
+      <input
+        type="text"
+        placeholder="Example: Broken classroom fan"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
 
-              </div>
+    </div>
 
 
-              <div className="form-field">
+    <div className="form-field">
 
-                <label>
-                  Priority
-                  <span>*</span>
-                </label>
+      <label>
+        Category
+        <span>*</span>
+      </label>
 
-                <select defaultValue="">
-                  <option value="" disabled>
-                    Select priority
-                  </option>
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
 
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
-                  <option>Critical</option>
-                </select>
+        <option value="" disabled>
+          Select a category
+        </option>
 
-              </div>
+        <option value="Infrastructure">Infrastructure</option>
+        <option value="Electrical">Electrical</option>
+        <option value="Plumbing">Plumbing</option>
+        <option value="Cleanliness">Cleanliness</option>
+        <option value="Safety">Safety</option>
+        <option value="Internet & Wi-Fi">Internet & Wi-Fi</option>
+        <option value="Other">Other</option>
 
+      </select>
 
-              <div className="form-field full">
-
-                <label>
-                  Description
-                  <span>*</span>
-                </label>
-
-                <textarea
-                  rows="6"
-                  placeholder="Describe the issue clearly. What happened? How does it affect students?"
-                ></textarea>
-
-              </div>
-
-            </div>
-
-          </section>
+    </div>
 
 
-          {/* LOCATION */}
+    <div className="form-field">
 
-          <section className="form-card">
+      <label>
+        Priority
+        <span>*</span>
+      </label>
 
-            <div className="form-card-title">
+      <select
+        value={priority}
+        onChange={(e) => setPriority(e.target.value)}
+      >
 
-              <div className="form-number">
-                02
-              </div>
+        <option value="" disabled>
+          Select priority
+        </option>
 
-              <div>
-                <h2>Location</h2>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+        <option value="Critical">Critical</option>
 
-                <p>
-                  Help the campus team find the issue quickly.
-                </p>
-              </div>
+      </select>
 
-            </div>
-
-
-            <div className="form-grid">
-
-              <div className="form-field">
-
-                <label>
-                  Building / Block
-                  <span>*</span>
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Example: Block A"
-                />
-
-              </div>
+    </div>
 
 
-              <div className="form-field">
+    <div className="form-field full">
 
-                <label>
-                  Floor
-                </label>
+      <label>
+        Description
+        <span>*</span>
+      </label>
 
-                <input
-                  type="text"
-                  placeholder="Example: 2nd Floor"
-                />
+      <textarea
+        rows="6"
+        placeholder="Describe the issue clearly. What happened? How does it affect students?"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
 
-              </div>
-
-
-              <div className="form-field full">
-
-                <label>
-                  Specific location
-                  <span>*</span>
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Example: Room 204, near the main entrance"
-                />
-
-              </div>
-
-            </div>
-
-          </section>
+    </div>
 
 
+  </div>
+
+</section>
+
+
+{/* LOCATION */}
+
+
+<section className="form-card">
+
+
+  <div className="form-card-title">
+
+    <div className="form-number">
+      02
+    </div>
+
+    <div>
+      <h2>Location</h2>
+
+      <p>
+        Help the campus team find the issue quickly.
+      </p>
+    </div>
+
+  </div>
+
+
+  <div className="form-grid">
+
+
+    <div className="form-field">
+
+      <label>
+        Building / Block
+        <span>*</span>
+      </label>
+
+      <input
+        type="text"
+        placeholder="Example: Block A"
+        value={building}
+        onChange={(e)=>setBuilding(e.target.value)}
+      />
+
+    </div>
+
+
+
+    <div className="form-field">
+
+      <label>
+        Floor
+      </label>
+
+      <input
+        type="text"
+        placeholder="Example: 2nd Floor"
+        value={floor}
+        onChange={(e)=>setFloor(e.target.value)}
+      />
+
+    </div>
+
+
+
+    <div className="form-field full">
+
+      <label>
+        Specific location
+        <span>*</span>
+      </label>
+
+      <input
+        type="text"
+        placeholder="Example: Room 204, near the main entrance"
+        value={location}
+        onChange={(e)=>setLocation(e.target.value)}
+      />
+
+    </div>
+
+
+  </div>
+
+
+</section>
           {/* PHOTO */}
 
           <section className="form-card">
