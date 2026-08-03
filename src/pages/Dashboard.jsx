@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import "../styles/dashboard.css";
 import "../App.css";
 
 function Dashboard() {
@@ -16,6 +17,15 @@ const inProgressReports = issues.filter(
 const resolvedReports = issues.filter(
   (issue) => issue.status === "Resolved"
 ).length;
+const hour = new Date().getHours();
+
+let greeting = "Good Evening";
+
+if (hour < 12) {
+  greeting = "Good Morning";
+} else if (hour < 17) {
+  greeting = "Good Afternoon";
+}
   useEffect(() => {
   const fetchIssues = async () => {
     const {
@@ -56,149 +66,213 @@ console.log(issues);
 
           <div className="welcome-section">
 
-            <div>
-              <p>Welcome 👋</p>
+  <div className="welcome-left">
 
-              <h1>Your Campus Dashboard</h1>
+    <span className="welcome-badge">
+      Student Dashboard
+    </span>
 
-              <span>
-                Stay updated and help make your campus better.
-              </span>
-            </div>
+  <h1>{greeting}, Karthi 👋</h1>
+    <p>
+      Manage campus issues, track report progress and help improve your campus with CampusPulse.
+    </p>
 
-            <Link to="/report" className="report-btn">
-              + Report an Issue
-            </Link>
+  </div>
 
-          </div>
+  <div className="welcome-right">
+    <Link to="/report" className="report-btn">
+      + Report Issue
+    </Link>
+  </div>
 
+</div>
 
           {/* EMPTY STAT CARDS */}
 
           <div className="stats-grid">
 
-            <div className="stat-card">
+  <div className="stat-card">
 
-              <div className="stat-icon blue">
-                ◫
-              </div>
+    <div className="stat-top">
+      <span className="stat-emoji">📄</span>
+      <span>Total Reports</span>
+    </div>
 
-              <div>
-                <span>Total Reports</span>
-                <strong>{totalReports}</strong>
-              </div>
+    <h2>{totalReports}</h2>
 
-              <small>Your submitted reports</small>
+    <p>Your submitted reports</p>
 
-            </div>
+  </div>
 
+  <div className="stat-card">
 
-            <div className="stat-card">
+    <div className="stat-top">
+      <span className="stat-emoji">🟠</span>
+      <span>In Progress</span>
+    </div>
 
-              <div className="stat-icon orange">
-                ◷
-              </div>
+    <h2>{inProgressReports}</h2>
 
-              <div>
-                <span>In Progress</span>
-                <strong>{inProgressReports}</strong>
-              </div>
+    <p>Reports currently under review</p>
 
-              <small>Reports being handled</small>
+  </div>
 
-            </div>
+  <div className="stat-card">
 
+    <div className="stat-top">
+      <span className="stat-emoji">🟢</span>
+      <span>Resolved</span>
+    </div>
 
-            <div className="stat-card">
+    <h2>{resolvedReports}</h2>
 
-              <div className="stat-icon green">
-                ✓
-              </div>
+    <p>Successfully completed reports</p>
 
-              <div>
-                <span>Resolved</span>
-                <strong>{resolvedReports}</strong>
-              </div>
+  </div>
 
-              <small>Successfully resolved</small>
+  <div className="stat-card">
 
-            </div>
+    <div className="stat-top">
+      <span className="stat-emoji">⭐</span>
+      <span>Impact Score</span>
+    </div>
 
+    <h2>{resolvedReports * 10}</h2>
 
-            <div className="stat-card">
+    <p>Your contribution score</p>
 
-              <div className="stat-icon purple">
-                ★
-              </div>
+  </div>
 
-              <div>
-                <span>Impact Score</span>
-                <strong>{resolvedReports * 10}</strong>
-              </div>
-
-              <small>Your contribution</small>
-
-            </div>
-
-          </div>
-
+</div>
 
           {/* RECENT REPORTS */}
 
           <section className="dashboard-section">
 
-            <div className="section-top">
+           <div className="section-top">
 
-              <div>
-                <h2>Recent Reports</h2>
+  <div>
+    <span className="section-label">
+      REPORTS
+    </span>
 
-                <p>
-                  Your recently submitted campus issues.
-                </p>
-              </div>
+    <h2>
+  📋 Recent Reports
+</h2>
 
-              <a href="#reports">
-                View all →
-              </a>
+    <p>
+      Here are your latest submitted campus issues.
+    </p>
 
-            </div>
+  </div>
+
+  <Link to="/my-reports" className="view-all-btn">
+    View All →
+  </Link>
+
+</div>
 
 
           {issues.length === 0 ? (
   <div className="empty-reports">
-    <div className="empty-icon">+</div>
 
-    <h3>No reports yet</h3>
-
-    <p>You haven't reported any campus issues yet.</p>
-
-    <Link to="/report" className="empty-report-btn">
-      Report an Issue
-    </Link>
+  <div className="empty-emoji">
+    📭
   </div>
+
+  <h3>No Reports Yet</h3>
+
+  <p>
+    You haven't reported any campus issues yet.
+    Click below to create your first report.
+  </p>
+
+  <Link to="/report" className="empty-report-btn">
+    + Report Issue
+  </Link>
+
+</div>
 ) : (
   <div className="reports-list">
     {issues.map((issue) => (
-      <div key={issue.id} className="report-card">
+  <div key={issue.id} className="report-card">
+
+    <div className="report-header">
+
+      <div className="report-title">
 
         <h3>{issue.title}</h3>
 
-        <p>{issue.description}</p>
-
-        <p><strong>Category:</strong> {issue.category}</p>
-
-        <p><strong>Priority:</strong> {issue.priority}</p>
-
-        <p><strong>Location:</strong> {issue.location}</p>
-
-        <div className="report-card-footer">
-          <span className="report-status">
-            {issue.status}
-          </span>
-        </div>
+        <p className="report-description">
+          {issue.description}
+        </p>
 
       </div>
-    ))}
+
+      <span
+  className={`status-badge ${
+    issue.status === "Resolved"
+      ? "status-resolved"
+      : issue.status === "In Progress"
+      ? "status-progress"
+      : "status-pending"
+  }`}
+>
+  {issue.status === "Resolved"
+    ? "✅ Resolved"
+    : issue.status === "In Progress"
+    ? "🛠 In Progress"
+    : "🟡 Pending"}
+</span>
+
+    </div>
+
+    <div className="report-tags">
+
+      <span className="tag">
+        ⚡ {issue.category}
+      </span>
+
+      <span
+  className={`priority-tag ${
+    issue.priority === "Critical"
+      ? "critical"
+      : issue.priority === "High"
+      ? "high"
+      : issue.priority === "Medium"
+      ? "medium"
+      : "low"
+  }`}
+>
+  🔥 {issue.priority}
+</span>
+
+      <span className="tag">
+        📍 {issue.location}
+      </span>
+
+    </div>
+
+    <div className="report-footer">
+
+      <span className="report-date">
+        🕒{new Date(issue.created_at).toLocaleString("en-IN", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+})}
+      </span>
+
+      <button className="view-btn">
+        View Details →
+      </button>
+
+    </div>
+
+  </div>
+))}
   </div>
 )}
 
@@ -207,65 +281,56 @@ console.log(issues);
 
           {/* QUICK ACTIONS */}
 
-          <section className="quick-section">
+         <section className="quick-section">
 
-            <h2>Quick Actions</h2>
+  <h2>
+  ⚡ Quick Actions
+</h2>
 
-            <div className="quick-grid">
+  <div className="quick-grid">
 
-            <Link to="/report" className="quick-card">
+    <Link to="/report" className="quick-card">
 
-            <div>＋</div>
+      <div className="quick-icon">📝</div>
 
-            <section>
-             <strong>Report an Issue</strong>
+      <section>
+        <strong>Report an Issue</strong>
+        <span>Create a new campus issue report.</span>
+      </section>
 
-           <span>
-                  Tell us about a campus problem.
-           </span>
-           </section>
+      <b>→</b>
 
-        <b>→</b>
+    </Link>
 
-            </Link>
+    <Link to="/my-reports" className="quick-card">
 
+      <div className="quick-icon">📂</div>
 
-              <button className="quick-card">
+      <section>
+        <strong>My Reports</strong>
+        <span>Track all your submitted reports.</span>
+      </section>
 
-                <div>▤</div>
+      <b>→</b>
 
-                <section>
-                  <strong>View My Reports</strong>
+    </Link>
 
-                  <span>
-                    Track your submitted issues.
-                  </span>
-                </section>
+    <button className="quick-card">
 
-                <b>→</b>
+      <div className="quick-icon">👤</div>
 
-              </button>
+      <section>
+        <strong>Profile</strong>
+        <span>Manage your account settings.</span>
+      </section>
 
+      <b>→</b>
 
-              <button className="quick-card">
+    </button>
 
-                <div>◯</div>
+  </div>
 
-                <section>
-                  <strong>Update Profile</strong>
-
-                  <span>
-                    Manage your account information.
-                  </span>
-                </section>
-
-                <b>→</b>
-
-              </button>
-
-            </div>
-
-          </section>
+</section>
 
         </section>
 
