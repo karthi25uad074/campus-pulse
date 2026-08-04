@@ -5,6 +5,9 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ReportIssue from "./pages/ReportIssue";
 import MyReports from "./pages/MyReports";
+import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -27,16 +30,50 @@ function App() {
         />
 
         <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+/>
         <Route
-          path="/report"
-          element={<ReportIssue />}
-        />
-        <Route path="/my-reports" element={<MyReports />} />
+  path="/report"
+  element={
+    <ProtectedRoute>
+      <ReportIssue />
+    </ProtectedRoute>
+  }
+/><Route
+  path="/my-reports"
+  element={
+    <ProtectedRoute>
+      <MyReports />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
 
       </Routes>
+      <Toaster
+  position="top-right"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      borderRadius: "12px",
+      background: "#0f172a",
+      color: "#fff",
+    },
+  }}
+/>
 
     </HashRouter>
   );

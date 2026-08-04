@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
 import "../App.css";
 function ReportIssue() {
   const navigate = useNavigate();
@@ -36,10 +37,11 @@ const handleSubmit = async (e) => {
   ]);
 
   if (error) {
+    toast.error("Failed to submit report!");
     alert(error.message);
     return;
   }
-
+  toast.success("Report submitted successfully!");
   alert("Issue reported successfully!");
   navigate("/dashboard");
 };

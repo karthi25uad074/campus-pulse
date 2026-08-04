@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
 import "../styles/myReports.css";
@@ -9,8 +10,38 @@ function MyReports() {
   const [issues, setIssues] = useState([]);
   const [search, setSearch] = useState("");
 const [filter, setFilter] = useState("All");
+const [selectedIssue, setSelectedIssue] = useState(null);
+const navigate = useNavigate();
 
-  useEffect(() => {
+  const deleteReport = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Delete this report?"
+  );
+
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("issues")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+
+    toast.error("Unable to delete report.");
+
+    return;
+
+  }
+
+  setIssues(
+    issues.filter((issue) => issue.id !== id)
+  );
+
+  toast.success("Report deleted successfully!");
+
+};
+useEffect(() => {
     const fetchIssues = async () => {
       const {
         data: { user },
@@ -172,15 +203,93 @@ const [filter, setFilter] = useState("All");
 
           <span>📍 {issue.location}</span>
 
-          <span>⚡ {issue.priority}</span>
+         <span
+  className={`priority-badge ${issue.priority.toLowerCase()}`}
+>
+  ⚡ {issue.priority}
+</span>
 
           <span>📂 {issue.category}</span>
 
+          <span>
+    📅 {new Date(issue.created_at).toLocaleDateString()}
+  </span>
+
         </div>
+        <div className="report-actions">
+
+ <button
+  className="edit-btn"
+  onClick={() => navigate(`/edit-report/${issue.id}`)}
+>
+  ✏️ Edit
+</button>
+
+  <button
+    className="delete-btn"
+    onClick={() => deleteReport(issue.id)}
+  >
+    🗑 Delete
+  </button>
+
+</div>
+        <div className="report-actions">
+
+  <button
+  className="view-btn"
+  onClick={() => setSelectedIssue(issue)}
+>
+  View Details →
+</button>
+
+</div>
 
       </div>
 
     ))}
+
+  </div>
+
+)}
+{selectedIssue && (
+
+  <div
+    className="modal-overlay"
+    onClick={() => setSelectedIssue(null)}
+  >
+
+    <div
+      className="report-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      <h2>{selectedIssue.title}</h2>
+
+      <p>{selectedIssue.description}</p>
+
+      <hr />
+
+      <p><strong>📂 Category:</strong> {selectedIssue.category}</p>
+
+      <p><strong>⚡ Priority:</strong> {selectedIssue.priority}</p>
+
+      <p><strong>📍 Location:</strong> {selectedIssue.location}</p>
+
+      <p><strong>🟢 Status:</strong> {selectedIssue.status}</p>
+
+      <p>
+        <strong>📅 Reported:</strong>{" "}
+        {new Date(selectedIssue.created_at).toLocaleString()}
+      </p>
+
+      <button
+        className="close-btn"
+        onClick={() => setSelectedIssue(null)}
+      >
+        Close
+      </button>
+
+    </div>
 
   </div>
 

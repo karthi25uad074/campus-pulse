@@ -1,0 +1,50 @@
+.logout-btn{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:14px 18px;
+
+    background:transparent;
+    border:none;
+
+    border-radius:12px;
+    cursor:pointer;
+
+    color:#64748b;
+    font-size:15px;
+    text-align:left;
+
+    transition:0.3s;
+}
+
+.logout-btn:hover{
+    background:#fee2e2;
+    color:#dc2626;
+}
+.sidebar-link{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 18px;
+    border-radius:12px;
+    text-decoration:none;
+    color:#64748b;
+    transition:.3s;
+}
+
+.sidebar-link:hover{
+    background:#eff6ff;
+    color:#2563eb;
+}
+
+.sidebar-link.active{
+    background:#dbeafe;
+    color:#2563eb;
+    font-weight:600;
+}
+.logout-btn{
+    border:none;
+    outline:none;
+}

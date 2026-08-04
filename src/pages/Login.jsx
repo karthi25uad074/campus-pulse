@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
 import "../App.css";
 
 function Login() {
@@ -12,17 +13,21 @@ const [password, setPassword] = useState("");
   e.preventDefault();
 
   const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  email,
+  password,
+});
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+if (error) {
 
-  alert("Login Successful!");
-  navigate("/dashboard");
+  toast.error("Invalid email or password");
+
+  return;
+
+}
+
+toast.success("Welcome back!");
+
+navigate("/dashboard");
 };
 
   return (

@@ -1,6 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link,NavLink, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 function Sidebar() {
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+
+  const confirmLogout = window.confirm(
+    "Are you sure you want to logout?"
+  );
+
+  if (!confirmLogout) return;
+
+  await supabase.auth.signOut();
+
+  navigate("/");
+
+};
   return (
     <aside className="sidebar">
 
@@ -17,33 +33,59 @@ function Sidebar() {
 
         <p className="nav-title">MAIN</p>
 
-        <Link to="/dashboard" className="sidebar-link active">
-          <span>⌂</span>
-          Dashboard
-        </Link>
+        <NavLink
+  to="/dashboard"
+  className={({ isActive }) =>
+    isActive ? "sidebar-link active" : "sidebar-link"
+  }
+>
+  <span>⌂</span>
+  Dashboard
+</NavLink>
 
-        <Link to="/report" className="sidebar-link">
-          <span>＋</span>
-          Report Issue
-        </Link>
+        <NavLink
+  to="/report"
+  className={({ isActive }) =>
+    isActive ? "sidebar-link active" : "sidebar-link"
+  }
+>
+  <span>＋</span>
+  Report Issue
+</NavLink>
 
-        <Link to="/my-reports" className="sidebar-link">
-          <span>▤</span>
-           My Reports
-        </Link>
+       <NavLink
+  to="/my-reports"
+  className={({ isActive }) =>
+    isActive ? "sidebar-link active" : "sidebar-link"
+  }
+>
+  <span>▤</span>
+  My Reports
+</NavLink>
 
 
         <p className="nav-title">ACCOUNT</p>
 
-        <Link to="/profile" className="sidebar-link">
-          <span>◯</span>
-          Profile
-        </Link>
+        <NavLink
+  to="/profile"
+  className={({ isActive }) =>
+    isActive ? "sidebar-link active" : "sidebar-link"
+  }
+>
+  <span>◯</span>
+  Profile
+</NavLink>
 
-        <Link to="/" className="sidebar-link">
-          <span>←</span>
-          Logout
-        </Link>
+       <button
+  className="sidebar-link logout-btn"
+  onClick={handleLogout}
+>
+
+  <span>←</span>
+
+  Logout
+
+</button>
 
       </nav>
 
