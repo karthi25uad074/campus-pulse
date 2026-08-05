@@ -8,6 +8,7 @@ import MyReports from "./pages/MyReports";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
     </ProtectedRoute>
   }
 />
+<Route path="/admin" element={<AdminDashboard />} />
 
 <Route
   path="/profile"

@@ -25,9 +25,20 @@ if (error) {
 
 }
 
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 toast.success("Welcome back!");
 
-navigate("/dashboard");
+if (user.email === "admin@campuspulse.com") {
+
+  navigate("/admin");
+
+} else {
+
+  navigate("/dashboard");
+
+}
 };
 
   return (
