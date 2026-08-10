@@ -8,6 +8,7 @@ import "../App.css";
 
 function Dashboard() {
   const [issues, setIssues] = useState([]);
+  const [selectedIssue, setSelectedIssue] = useState(null);
   const totalReports = issues.length;
 
 const inProgressReports = issues.filter(
@@ -265,9 +266,12 @@ console.log(issues);
 })}
       </span>
 
-      <button className="view-btn">
-        View Details →
-      </button>
+      <button
+  className="view-btn"
+  onClick={() => setSelectedIssue(issue)}
+>
+  View Details →
+</button>
 
     </div>
 
@@ -334,6 +338,70 @@ console.log(issues);
 
         </section>
 
+{selectedIssue && (
+  <div
+    className="issue-modal-overlay"
+    onClick={() => setSelectedIssue(null)}
+  >
+    <div
+      className="issue-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="issue-modal-header">
+        <h2>{selectedIssue.title}</h2>
+
+        <button
+          className="modal-close"
+          onClick={() => setSelectedIssue(null)}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="issue-modal-content">
+
+        <p>
+          <strong>Description</strong>
+          <br />
+          {selectedIssue.description}
+        </p>
+
+        <p>
+          <strong>Category:</strong>{" "}
+          {selectedIssue.category}
+        </p>
+
+        <p>
+          <strong>Priority:</strong>{" "}
+          {selectedIssue.priority}
+        </p>
+
+        <p>
+          <strong>Status:</strong>{" "}
+          {selectedIssue.status}
+        </p>
+
+        <p>
+          <strong>Location:</strong>{" "}
+          {selectedIssue.location}
+        </p>
+
+        <p>
+          <strong>Submitted:</strong>{" "}
+          {new Date(selectedIssue.created_at).toLocaleString("en-IN")}
+        </p>
+
+      </div>
+
+      <button
+        className="modal-close-btn"
+        onClick={() => setSelectedIssue(null)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
       </main>
 
     </div>
