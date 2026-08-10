@@ -363,7 +363,28 @@ const deleteReport = async (id) => {
       <p>
         <strong>Location:</strong> {selectedReport.location}
       </p>
+      {selectedIssue.evidence_url && (
+  <div className="evidence-preview">
+    <h3>📷 Evidence</h3>
 
+    <img
+      src={selectedIssue.evidence_url}
+      alt="Issue evidence"
+      className="evidence-thumbnail"
+      onClick={() =>
+        navigate(
+          `/evidence?url=${encodeURIComponent(
+            selectedIssue.evidence_url
+          )}`
+        )
+      }
+    />
+
+    <p className="evidence-hint">
+      Click image to view full size
+    </p>
+  </div>
+)}
       <button
         className="close-modal"
         onClick={() => setSelectedReport(null)}
@@ -476,28 +497,6 @@ const deleteReport = async (id) => {
           <strong>Location:</strong>{" "}
           {selectedReport.location}
         </p>
-        {selectedIssue.evidence_url && (
-  <div className="evidence-preview">
-    <h3>📷 Evidence</h3>
-
-    <img
-      src={selectedIssue.evidence_url}
-      alt="Issue evidence"
-      className="evidence-thumbnail"
-      onClick={() =>
-        navigate(
-          `/evidence?url=${encodeURIComponent(
-            selectedIssue.evidence_url
-          )}`
-        )
-      }
-    />
-
-    <p className="evidence-hint">
-      Click image to view full size
-    </p>
-  </div>
-)}
 
       </div>
 
