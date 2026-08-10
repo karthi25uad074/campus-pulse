@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend
+} from "recharts";
 import { supabase } from "../lib/supabase";
 import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
@@ -46,6 +53,26 @@ const [selectedReport, setSelectedReport] = useState(null);
   return matchesSearch && matchesFilter;
 
 });
+const chartData = [
+  {
+    name: "Pending",
+    value: reports.filter(
+      report => report.status === "Pending"
+    ).length
+  },
+  {
+    name: "In Progress",
+    value: reports.filter(
+      report => report.status === "In Progress"
+    ).length
+  },
+  {
+    name: "Resolved",
+    value: reports.filter(
+      report => report.status === "Resolved"
+    ).length
+  }
+];
 const updateStatus = async (id, status) => {
 
   const { error } = await supabase
@@ -54,10 +81,10 @@ const updateStatus = async (id, status) => {
     .eq("id", id);
 
   if (error) {
-    console.log(error);
+    toast.error("Failed to update status");
+    console.log("Update error:",error);
     return;
   }
-  console.log(data);
 
   setReports((prev) =>
     prev.map((report) =>
@@ -67,6 +94,7 @@ const updateStatus = async (id, status) => {
     )
   );
 
+  toast.success(`Status updated to ${status}`);
 };
 const deleteReport = async (id) => {
 
@@ -151,6 +179,42 @@ const deleteReport = async (id) => {
             </div>
 
           </div>
+          <div className="analytics-chart">
+
+  <div className="chart-header">
+    <h2>Report Status Overview</h2>
+    <p>Current status of all submitted reports</p>
+  </div>
+
+  <div className="chart-container">
+
+    <PieChart width={350} height={300}>
+
+      <Pie
+        data={chartData}
+        dataKey="value"
+        nameKey="name"
+        cx="50%"
+        cy="50%"
+        outerRadius={100}
+        label
+      >
+
+        <Cell fill="#f59e0b" />
+        <Cell fill="#3b82f6" />
+        <Cell fill="#22c55e" />
+
+      </Pie>
+
+      <Tooltip />
+
+      <Legend />
+
+    </PieChart>
+
+  </div>
+
+</div>
           <div className="admin-toolbar">
 
   <input
@@ -308,9 +372,123 @@ const deleteReport = async (id) => {
     </div>
   </div>
 )}
-        </section>
+{selectedReport && (
+  <div className="modal-overlay">
 
-      </main>
+    <div className="report-modal">
+
+      <div className="modal-header">
+        <h2>{selectedReport.title}</h2>
+
+        <button
+          className="modal-close"
+          onClick={() => setSelectedReport(null)}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="modal-content">
+
+        <p>
+          <strong>Description</strong>
+          <br />
+          {selectedReport.description}
+        </p>
+
+        <p>
+          <strong>Category:</strong>{" "}
+          {selectedReport.category}
+        </p>
+
+        <p>
+          <strong>Priority:</strong>{" "}
+          {selectedReport.priority}
+        </p>
+
+        <p>
+          <strong>Status:</strong>{" "}
+          {selectedReport.status}
+        </p>
+
+        <p>
+          <strong>Location:</strong>{" "}
+          {selectedReport.location}
+        </p>
+
+      </div>
+
+      <button
+        className="close-modal"
+        onClick={() => setSelectedReport(null)}
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+)}
+       </section>
+
+ {selectedReport && (
+  <div className="modal-overlay">
+
+    <div className="report-modal">
+
+      <div className="modal-header">
+        <h2>{selectedReport.title}</h2>
+
+        <button
+          className="modal-close"
+          onClick={() => setSelectedReport(null)}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="modal-content">
+
+        <p>
+          <strong>Description</strong>
+          <br />
+          {selectedReport.description}
+        </p>
+
+        <p>
+          <strong>Category:</strong>{" "}
+          {selectedReport.category}
+        </p>
+
+        <p>
+          <strong>Priority:</strong>{" "}
+          {selectedReport.priority}
+        </p>
+
+        <p>
+          <strong>Status:</strong>{" "}
+          {selectedReport.status}
+        </p>
+
+        <p>
+          <strong>Location:</strong>{" "}
+          {selectedReport.location}
+        </p>
+
+      </div>
+
+      <button
+        className="close-modal"
+        onClick={() => setSelectedReport(null)}
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+)}
+     </main>
 
     </div>
 
