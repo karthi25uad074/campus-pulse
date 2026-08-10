@@ -319,18 +319,18 @@ console.log(issues);
 
     </Link>
 
-    <button className="quick-card">
+    <Link to="/profile" className="quick-card">
 
-      <div className="quick-icon">👤</div>
+  <div className="quick-icon">👤</div>
 
-      <section>
-        <strong>Profile</strong>
-        <span>Manage your account settings.</span>
-      </section>
+  <section>
+    <strong>Profile</strong>
+    <span>Manage your account settings.</span>
+  </section>
 
-      <b>→</b>
+  <b>→</b>
 
-    </button>
+</Link>
 
   </div>
 
