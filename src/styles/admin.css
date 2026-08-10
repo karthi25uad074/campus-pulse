@@ -657,3 +657,16 @@ tbody tr:hover{
   }
 
 }
+.admin-evidence {
+  margin-top: 20px;
+}
+
+.admin-evidence-image {
+  display: block;
+  width: 180px;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 10px;
+  border: 1px solid #e5e7eb;
+}

@@ -20,6 +20,7 @@ function AdminDashboard() {
 const [filter, setFilter] = useState("All");
 const navigate = useNavigate();
 const [selectedReport, setSelectedReport] = useState(null);
+const [selectedIssue, setSelectedIssue] = useState(null);
 
   useEffect(() => {
 
@@ -320,10 +321,10 @@ const deleteReport = async (id) => {
           <td>
 
            <button
-  className="view-action"
-  onClick={() => setSelectedReport(report)}
+  className="view-btn"
+ onClick={() => setSelectedReport(report)}
 >
-  👁 View
+  View Details →
 </button>
           </td>
 
@@ -363,18 +364,18 @@ const deleteReport = async (id) => {
       <p>
         <strong>Location:</strong> {selectedReport.location}
       </p>
-      {selectedIssue.evidence_url && (
+      {selectedReport.evidence_url && (
   <div className="evidence-preview">
     <h3>📷 Evidence</h3>
 
     <img
-      src={selectedIssue.evidence_url}
+      src={selectedReport.evidence_url}
       alt="Issue evidence"
       className="evidence-thumbnail"
       onClick={() =>
         navigate(
           `/evidence?url=${encodeURIComponent(
-            selectedIssue.evidence_url
+            selectedReport.evidence_url
           )}`
         )
       }
@@ -395,122 +396,9 @@ const deleteReport = async (id) => {
     </div>
   </div>
 )}
-{selectedReport && (
-  <div className="modal-overlay">
 
-    <div className="report-modal">
-
-      <div className="modal-header">
-        <h2>{selectedReport.title}</h2>
-
-        <button
-          className="modal-close"
-          onClick={() => setSelectedReport(null)}
-        >
-          ✕
-        </button>
-      </div>
-
-      <div className="modal-content">
-
-        <p>
-          <strong>Description</strong>
-          <br />
-          {selectedReport.description}
-        </p>
-
-        <p>
-          <strong>Category:</strong>{" "}
-          {selectedReport.category}
-        </p>
-
-        <p>
-          <strong>Priority:</strong>{" "}
-          {selectedReport.priority}
-        </p>
-
-        <p>
-          <strong>Status:</strong>{" "}
-          {selectedReport.status}
-        </p>
-
-        <p>
-          <strong>Location:</strong>{" "}
-          {selectedReport.location}
-        </p>
-
-      </div>
-
-      <button
-        className="close-modal"
-        onClick={() => setSelectedReport(null)}
-      >
-        Close
-      </button>
-
-    </div>
-
-  </div>
-)}
        </section>
 
- {selectedReport && (
-  <div className="modal-overlay">
-
-    <div className="report-modal">
-
-      <div className="modal-header">
-        <h2>{selectedReport.title}</h2>
-
-        <button
-          className="modal-close"
-          onClick={() => setSelectedReport(null)}
-        >
-          ✕
-        </button>
-      </div>
-
-      <div className="modal-content">
-
-        <p>
-          <strong>Description</strong>
-          <br />
-          {selectedReport.description}
-        </p>
-
-        <p>
-          <strong>Category:</strong>{" "}
-          {selectedReport.category}
-        </p>
-
-        <p>
-          <strong>Priority:</strong>{" "}
-          {selectedReport.priority}
-        </p>
-
-        <p>
-          <strong>Status:</strong>{" "}
-          {selectedReport.status}
-        </p>
-
-        <p>
-          <strong>Location:</strong>{" "}
-          {selectedReport.location}
-        </p>
-
-      </div>
-
-      <button
-        className="close-modal"
-        onClick={() => setSelectedReport(null)}
-      >
-        Close
-      </button>
-
-    </div>
-
-  </div>
-)}
      </main>
 
     </div>
