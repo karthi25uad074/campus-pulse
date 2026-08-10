@@ -274,15 +274,24 @@ useEffect(() => {
       <p><strong>⚡ Priority:</strong> {selectedIssue.priority}</p>
 
       <p><strong>📍 Location:</strong> {selectedIssue.location}</p>
-      {selectedIssue.evidence_url && (
-  <div className="evidence-section">
-    <strong>Evidence</strong>
+     {selectedIssue.evidence_url && (
+  <div className="evidence-preview">
+    <h3>📷 Evidence</h3>
 
     <img
       src={selectedIssue.evidence_url}
       alt="Issue evidence"
-      className="evidence-image"
+      className="evidence-thumbnail"
+      onClick={() =>
+        navigate(
+          `/evidence?url=${encodeURIComponent(selectedIssue.evidence_url)}`
+        )
+      }
     />
+
+    <p className="evidence-hint">
+      Click image to view full size
+    </p>
   </div>
 )}
 

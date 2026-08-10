@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import AdminDashboard from "./pages/AdminDashboard";
 import EditReport from "./pages/EditReport";
+import EvidenceViewer from "./pages/EvidenceViewer";
 
 function App() {
   return (
@@ -67,6 +68,10 @@ function App() {
 <Route
   path="/edit-report/:id"
   element={<EditReport />}
+/>
+<Route
+  path="/evidence"
+  element={<EvidenceViewer />}
 />
 
       </Routes>
