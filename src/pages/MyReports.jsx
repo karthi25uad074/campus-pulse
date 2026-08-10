@@ -274,7 +274,15 @@ useEffect(() => {
       <p><strong>⚡ Priority:</strong> {selectedIssue.priority}</p>
 
       <p><strong>📍 Location:</strong> {selectedIssue.location}</p>
-     {selectedIssue.evidence_url && (
+     
+
+      <p><strong>🟢 Status:</strong> {selectedIssue.status}</p>
+
+      <p>
+        <strong>📅 Reported:</strong>{" "}
+        {new Date(selectedIssue.created_at).toLocaleString()}
+      </p>
+      {selectedIssue.evidence_url && (
   <div className="evidence-preview">
     <h3>📷 Evidence</h3>
 
@@ -294,13 +302,6 @@ useEffect(() => {
     </p>
   </div>
 )}
-
-      <p><strong>🟢 Status:</strong> {selectedIssue.status}</p>
-
-      <p>
-        <strong>📅 Reported:</strong>{" "}
-        {new Date(selectedIssue.created_at).toLocaleString()}
-      </p>
 
       <button
         className="close-btn"

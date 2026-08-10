@@ -10,6 +10,7 @@ import { supabase } from "../lib/supabase";
 import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import "../styles/admin.css";
 
 function AdminDashboard() {
@@ -17,6 +18,7 @@ function AdminDashboard() {
   const [reports, setReports] = useState([]);
   const [search, setSearch] = useState("");
 const [filter, setFilter] = useState("All");
+const navigate = useNavigate();
 const [selectedReport, setSelectedReport] = useState(null);
 
   useEffect(() => {
@@ -474,6 +476,28 @@ const deleteReport = async (id) => {
           <strong>Location:</strong>{" "}
           {selectedReport.location}
         </p>
+        {selectedIssue.evidence_url && (
+  <div className="evidence-preview">
+    <h3>📷 Evidence</h3>
+
+    <img
+      src={selectedIssue.evidence_url}
+      alt="Issue evidence"
+      className="evidence-thumbnail"
+      onClick={() =>
+        navigate(
+          `/evidence?url=${encodeURIComponent(
+            selectedIssue.evidence_url
+          )}`
+        )
+      }
+    />
+
+    <p className="evidence-hint">
+      Click image to view full size
+    </p>
+  </div>
+)}
 
       </div>
 

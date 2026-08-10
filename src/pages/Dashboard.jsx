@@ -3,11 +3,13 @@ import Sidebar from "../components/Sidebar";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import "../App.css";
 
 function Dashboard() {
   const [issues, setIssues] = useState([]);
+  const navigate = useNavigate();
   const [selectedIssue, setSelectedIssue] = useState(null);
   const totalReports = issues.length;
 
@@ -392,6 +394,28 @@ console.log(issues);
         </p>
 
       </div>
+      {selectedIssue.evidence_url && (
+  <div className="evidence-preview">
+    <h3>📷 Evidence</h3>
+
+    <img
+      src={selectedIssue.evidence_url}
+      alt="Issue evidence"
+      className="evidence-thumbnail"
+      onClick={() =>
+        navigate(
+          `/evidence?url=${encodeURIComponent(
+            selectedIssue.evidence_url
+          )}`
+        )
+      }
+    />
+
+    <p className="evidence-hint">
+      Click image to view full size
+    </p>
+  </div>
+)}
 
       <button
         className="modal-close-btn"
