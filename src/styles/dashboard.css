@@ -861,3 +861,54 @@
   }
 
 }
+@media (max-width: 768px) {
+
+  .report-card {
+    overflow: visible !important;
+  }
+
+  .report-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    margin-bottom: 20px !important;
+    position: static !important;
+    height: auto !important;
+  }
+
+  .report-title {
+    width: 100% !important;
+    position: static !important;
+  }
+
+  .status-badge {
+    position: static !important;
+    display: inline-flex !important;
+    align-self: flex-start !important;
+    flex-shrink: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    z-index: 2 !important;
+  }
+
+  .report-tags {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin-top: 10px !important;
+    position: static !important;
+    width: 100% !important;
+  }
+
+  .report-tags .tag,
+  .report-tags .priority-tag {
+    position: static !important;
+    margin: 0 !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+  }
+
+}
