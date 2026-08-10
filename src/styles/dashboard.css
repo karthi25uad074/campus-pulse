@@ -435,3 +435,117 @@
     font-size:inherit;
     font-weight:inherit;
 }
+/* =========================
+   MOBILE RESPONSIVE FIX
+========================= */
+
+@media (max-width: 600px) {
+
+  .dashboard-main {
+    width: calc(100% - 70px);
+    margin-left: 70px;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 14px 40px;
+    overflow-x: hidden;
+  }
+
+  .welcome-section {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .welcome-left {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .welcome-left h1 {
+    font-size: 28px !important;
+    line-height: 1.25;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  .welcome-left p {
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 100%;
+  }
+
+  .welcome-right {
+    width: 100%;
+  }
+
+  .report-btn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .stat-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .dashboard-section {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .section-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .section-top h2 {
+    font-size: 22px;
+  }
+
+  .report-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .report-header h3,
+  .report-title h3 {
+    font-size: 18px;
+  }
+
+  .report-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .view-btn {
+    width: 100%;
+  }
+
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
