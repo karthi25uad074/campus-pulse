@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import AdminDashboard from "./pages/AdminDashboard";
+import EditReport from "./pages/EditReport";
 
 function App() {
   return (
@@ -62,6 +63,10 @@ function App() {
       <Profile />
     </ProtectedRoute>
   }
+/>
+<Route
+  path="/edit-report/:id"
+  element={<EditReport />}
 />
 
       </Routes>
