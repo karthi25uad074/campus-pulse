@@ -274,6 +274,17 @@ useEffect(() => {
       <p><strong>⚡ Priority:</strong> {selectedIssue.priority}</p>
 
       <p><strong>📍 Location:</strong> {selectedIssue.location}</p>
+      {selectedIssue.evidence_url && (
+  <div className="evidence-section">
+    <strong>Evidence</strong>
+
+    <img
+      src={selectedIssue.evidence_url}
+      alt="Issue evidence"
+      className="evidence-image"
+    />
+  </div>
+)}
 
       <p><strong>🟢 Status:</strong> {selectedIssue.status}</p>
 

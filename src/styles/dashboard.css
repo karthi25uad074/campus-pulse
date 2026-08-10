@@ -912,3 +912,23 @@
   }
 
 }
+.evidence-section {
+  margin-top: 20px;
+}
+
+.evidence-section strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.evidence-image {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  max-height: 350px;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
