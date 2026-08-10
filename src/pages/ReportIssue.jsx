@@ -13,6 +13,7 @@ const [description, setDescription] = useState("");
 const [building, setBuilding] = useState("");
 const [floor, setFloor] = useState("");
 const [location, setLocation] = useState("");
+const [evidenceFile, setEvidenceFile] = useState(null);
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -21,28 +22,60 @@ const handleSubmit = async (e) => {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    alert("Please login first.");
+    toast.error("Please login first.");
     return;
   }
 
-  const { error } = await supabase.from("issues").insert([
-    {
-      title,
-      description,
-      category,
-      priority,
-      location: `${building} ${floor} ${location}`,
-      user_id: user.id,
-    },
-  ]);
+  let evidenceUrl = null;
+
+  // Upload evidence image
+  if (evidenceFile) {
+
+    const fileExt = evidenceFile.name.split(".").pop();
+
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("evidence")
+      .upload(fileName, evidenceFile);
+
+    if (uploadError) {
+      console.log(uploadError);
+      toast.error("Failed to upload evidence");
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("evidence")
+      .getPublicUrl(fileName);
+
+    evidenceUrl = publicUrlData.publicUrl;
+  }
+
+  // Save report
+  const { error } = await supabase
+    .from("issues")
+    .insert([
+      {
+        title,
+        description,
+        category,
+        priority,
+        location: `${building} ${floor} ${location}`,
+        user_id: user.id,
+        status: "Pending",
+        evidence_url: evidenceUrl,
+      },
+    ]);
 
   if (error) {
+    console.log(error);
     toast.error("Failed to submit report!");
-    alert(error.message);
     return;
   }
+
   toast.success("Report submitted successfully!");
-  alert("Issue reported successfully!");
+
   navigate("/dashboard");
 };
   return (
@@ -318,13 +351,30 @@ const handleSubmit = async (e) => {
 
                 Choose Image
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                />
+               <input
+  type="file"
+  accept="image/png,image/jpeg,image/jpg"
+  hidden
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
+      return;
+    }
+
+    setEvidenceFile(file);
+  }}
+/>
 
               </label>
+              {evidenceFile && (
+  <p className="selected-file">
+    📎 {evidenceFile.name}
+  </p>
+)}
 
               <small>
                 PNG, JPG or JPEG • Maximum 5MB
