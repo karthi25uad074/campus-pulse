@@ -258,7 +258,15 @@ const deleteReport = async (id) => {
 
         <th>Title</th>
 
+        <th>Student</th>
+
         <th>Category</th>
+
+        <th>Student Name</th>
+
+        <th>Student Email</th>
+
+        <th>Student ID</th>
 
         <th>Priority</th>
 
@@ -279,6 +287,12 @@ const deleteReport = async (id) => {
         <tr key={report.id}>
 
           <td>{report.title}</td>
+          <td>
+  <div className="student-info">
+    <strong>{report.student_name || "Unknown"}</strong>
+    <small>{report.student_id || "No ID"}</small>
+  </div>
+</td>
 
           <td>{report.category}</td>
 
@@ -345,6 +359,21 @@ const deleteReport = async (id) => {
       <h2>{selectedReport.title}</h2>
 
       <p>
+  <strong>Student:</strong>{" "}
+  {selectedReport.student_name || "Unknown"}
+</p>
+
+<p>
+  <strong>Student ID:</strong>{" "}
+  {selectedReport.student_id || "N/A"}
+</p>
+
+<p>
+  <strong>Email:</strong>{" "}
+  {selectedReport.student_email || "N/A"}
+</p>
+
+      <p>
         <strong>Description:</strong><br />
         {selectedReport.description}
       </p>
@@ -364,6 +393,20 @@ const deleteReport = async (id) => {
       <p>
         <strong>Location:</strong> {selectedReport.location}
       </p>
+      <p>
+  <strong>Student:</strong>{" "}
+  {selectedReport.student_name || "Unknown"}
+</p>
+
+<p>
+  <strong>Student ID:</strong>{" "}
+  {selectedReport.student_id || "Not provided"}
+</p>
+
+<p>
+  <strong>Email:</strong>{" "}
+  {selectedReport.student_email || "Not provided"}
+</p>
       {selectedReport.evidence_url && (
   <div className="evidence-preview">
     <h3>📷 Evidence</h3>

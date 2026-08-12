@@ -65,6 +65,9 @@ const handleSubmit = async (e) => {
         user_id: user.id,
         status: "Pending",
         evidence_url: evidenceUrl,
+        student_name: user.user_metadata?.full_name || "Unknown",
+    student_email: user.email,
+    student_id: user.user_metadata?.student_id || "Not provided",
       },
     ]);
 

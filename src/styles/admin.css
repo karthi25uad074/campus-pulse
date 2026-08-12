@@ -774,3 +774,17 @@ tbody tr:hover{
   }
 
 }
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.student-info strong {
+  font-size: 14px;
+}
+
+.student-info small {
+  color: #64748b;
+  font-size: 12px;
+}
