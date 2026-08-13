@@ -894,27 +894,55 @@ tbody tr:hover{
   }
 
 }
-/* =========================
-   ADMIN TABLE MOBILE FIX
-========================= */
+/* =====================================
+   ADMIN DASHBOARD - MOBILE TABLE FIX
+===================================== */
 
 @media (max-width: 768px) {
 
-  .admin-table {
+  /* Remove page-level horizontal scrolling */
+  html,
+  body,
+  #root {
     width: 100%;
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
+    max-width: 100%;
+    overflow-x: hidden !important;
   }
 
-  /* Horizontal scroll only for table */
+  .dashboard-layout {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-main {
+    width: calc(100% - 70px) !important;
+    max-width: calc(100% - 70px) !important;
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden !important;
+  }
+
+  /* ONLY the table can scroll horizontally */
   .admin-table {
-    overflow-x: auto;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
   }
 
+  /* Keep table normal - DON'T collapse it */
   .admin-table table {
-    width: 900px;          /* Don't collapse */
+    width: 900px !important;
+    min-width: 900px !important;
+    max-width: none !important;
     border-collapse: collapse;
   }
 
@@ -922,18 +950,6 @@ tbody tr:hover{
   .admin-table td {
     white-space: nowrap;
     padding: 12px 14px;
-    font-size: 13px;
-    text-align: left;
   }
 
-  .status-select{
-    min-width: 120px;
-  }
-
-  .view-btn,
-  .delete-btn{
-    min-width: 90px;
-    font-size: 12px;
-    padding: 8px 10px;
-  }
 }
