@@ -932,3 +932,175 @@
   border: 1px solid #e2e8f0;
   cursor: pointer;
 }
+/* STUDENT DASHBOARD - FINAL MOBILE FIX */
+
+@media (max-width: 768px) {
+
+  .dashboard-layout {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .dashboard-main {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    padding: 20px 16px;
+    box-sizing: border-box;
+  }
+
+  .welcome-section {
+    width: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .welcome-left {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .welcome-left h1 {
+    font-size: 28px !important;
+    white-space: normal !important;
+    word-break: normal;
+  }
+
+  .welcome-left p {
+    font-size: 15px;
+  }
+
+  .welcome-right {
+    width: 100%;
+  }
+
+  .report-btn {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stats-grid {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+
+  .stat-card {
+    min-width: 0;
+    padding: 18px;
+    box-sizing: border-box;
+  }
+
+  .stat-card h2 {
+    font-size: 28px;
+  }
+
+  .dashboard-section {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 16px;
+    overflow: hidden;
+  }
+
+  .section-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .section-top h2 {
+    font-size: 22px;
+  }
+
+  .report-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .report-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .report-title {
+    min-width: 0;
+  }
+
+  .report-title h3 {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+
+  .report-description {
+    overflow-wrap: anywhere;
+  }
+
+  .status-badge {
+    align-self: flex-start;
+  }
+
+  .report-tags {
+    gap: 8px;
+  }
+
+  .report-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .view-btn {
+    width: 100%;
+  }
+
+  .quick-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .quick-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-top {
+    font-size: 13px;
+  }
+
+  .stat-emoji {
+    font-size: 20px;
+  }
+
+  .stat-card h2 {
+    font-size: 24px;
+  }
+
+  .stat-card p {
+    font-size: 12px;
+  }
+
+  .dashboard-content {
+    padding: 16px 12px;
+  }
+
+  .welcome-section {
+    padding: 20px 16px;
+  }
+}
