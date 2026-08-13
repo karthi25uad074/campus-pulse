@@ -894,62 +894,83 @@ tbody tr:hover{
   }
 
 }
-/* =====================================
-   ADMIN DASHBOARD - MOBILE TABLE FIX
-===================================== */
+/* ==========================================
+   ADMIN DASHBOARD - CLEAN MOBILE TABLE
+========================================== */
 
-@media (max-width: 768px) {
-
-  /* Remove page-level horizontal scrolling */
-  html,
-  body,
-  #root {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden !important;
-  }
-
-  .dashboard-layout {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden !important;
-  }
+@media screen and (max-width: 768px) {
 
   .dashboard-main {
-    width: calc(100% - 70px) !important;
-    max-width: calc(100% - 70px) !important;
     overflow-x: hidden !important;
   }
 
   .dashboard-content {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
     overflow-x: hidden !important;
   }
 
-  /* ONLY the table can scroll horizontally */
   .admin-table {
     width: 100% !important;
     max-width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    box-sizing: border-box;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
 
-  /* Keep table normal - DON'T collapse it */
   .admin-table table {
-    width: 900px !important;
-    min-width: 900px !important;
-    max-width: none !important;
-    border-collapse: collapse;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
   }
 
   .admin-table th,
   .admin-table td {
-    white-space: nowrap;
-    padding: 12px 14px;
+    padding: 10px 6px !important;
+    font-size: 11px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
   }
 
+  .admin-table th:nth-child(1),
+  .admin-table td:nth-child(1) {
+    width: 25%;
+  }
+
+  .admin-table th:nth-child(4),
+  .admin-table td:nth-child(4) {
+    width: 25%;
+  }
+
+  .admin-table th:nth-child(6),
+  .admin-table td:nth-child(6) {
+    width: 30%;
+  }
+
+  .admin-table th:nth-child(2),
+  .admin-table td:nth-child(2),
+  .admin-table th:nth-child(3),
+  .admin-table td:nth-child(3),
+  .admin-table th:nth-child(5),
+  .admin-table td:nth-child(5) {
+    display: none !important;
+  }
+
+  .status-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 10px !important;
+  }
+
+  .delete-btn,
+  .view-btn,
+  .view-action {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 7px 4px !important;
+    font-size: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .delete-btn {
+    margin-top: 5px !important;
+  }
 }
