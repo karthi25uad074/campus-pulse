@@ -894,3 +894,46 @@ tbody tr:hover{
   }
 
 }
+/* =========================
+   ADMIN TABLE MOBILE FIX
+========================= */
+
+@media (max-width: 768px) {
+
+  .admin-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  /* Horizontal scroll only for table */
+  .admin-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table table {
+    width: 900px;          /* Don't collapse */
+    border-collapse: collapse;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    white-space: nowrap;
+    padding: 12px 14px;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .status-select{
+    min-width: 120px;
+  }
+
+  .view-btn,
+  .delete-btn{
+    min-width: 90px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
