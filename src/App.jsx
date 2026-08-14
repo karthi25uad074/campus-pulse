@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 import AdminDashboard from "./pages/AdminDashboard";
 import EditReport from "./pages/EditReport";
 import EvidenceViewer from "./pages/EvidenceViewer";
+import Leaderboard from "./pages/Leaderboard";
 
 function App() {
   return (
@@ -73,7 +74,7 @@ function App() {
   path="/evidence"
   element={<EvidenceViewer />}
 />
-
+<Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
       <Toaster
   position="top-right"

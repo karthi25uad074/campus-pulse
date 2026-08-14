@@ -1405,3 +1405,65 @@
   }
 
 }
+.badges-section {
+  margin-top: 25px;
+  padding: 25px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.05);
+}
+
+.badges-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.badges-title h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.badge-card {
+  padding: 18px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 14px;
+}
+
+.badge-card span {
+  display: block;
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.badge-card strong {
+  display: block;
+  color: #0f172a;
+}
+
+.badge-card small {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .badges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .badges-grid {
+    grid-template-columns: 1fr;
+  }
+}

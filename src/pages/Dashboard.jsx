@@ -9,6 +9,7 @@ import "../App.css";
 
 function Dashboard() {
   const [issues, setIssues] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [userName, setUserName] = useState("");
   const navigate = useNavigate();
   const [selectedIssue, setSelectedIssue] = useState(null);
@@ -21,6 +22,8 @@ const inProgressReports = issues.filter(
 const resolvedReports = issues.filter(
   (issue) => issue.status === "Resolved"
 ).length;
+const contributionPoints =
+  (totalReports * 10) + (resolvedReports * 20);
 const hour = new Date().getHours();
 
 let greeting = "Good Evening";
@@ -37,6 +40,17 @@ if (hour < 12) {
     } = await supabase.auth.getUser();
 
     if (!user) return;
+    const { data: profileData, error: profileError } = await supabase
+  .from("profiles")
+  .select("points, reports_count, badge")
+  .eq("id", user.id)
+  .single();
+
+if (profileError) {
+  console.log("Profile error:", profileError);
+} else {
+  setProfile(profileData);
+}
     const name =
   user.user_metadata?.full_name ||
   user.user_metadata?.name ||
@@ -141,18 +155,18 @@ console.log(issues);
 
   </div>
 
-  <div className="stat-card">
+  <div className="stat-card contribution-stat">
 
-    <div className="stat-top">
-      <span className="stat-emoji">⭐</span>
-      <span>Impact Score</span>
-    </div>
-
-    <h2>{resolvedReports * 10}</h2>
-
-    <p>Your contribution score</p>
-
+  <div className="stat-top">
+    <span className="stat-emoji">🏆</span>
+    <span>Contribution Points</span>
   </div>
+
+  <h2>{contributionPoints}</h2>
+
+<p>{totalReports} reports submitted</p>
+
+</div>
 
 </div>
 
@@ -291,7 +305,58 @@ console.log(issues);
 )}
 
           </section>
+          {/* BADGES */}
 
+<div className="badges-section">
+
+  <div className="badges-title">
+    <span>🏅</span>
+    <h2>Your Badges</h2>
+  </div>
+
+  <div className="badges-grid">
+
+    {issues.length >= 1 && (
+      <div className="badge-card">
+        <span>🥇</span>
+        <strong>First Reporter</strong>
+        <small>Submitted your first report</small>
+      </div>
+    )}
+
+    {issues.length >= 5 && (
+      <div className="badge-card">
+        <span>🏆</span>
+        <strong>Campus Helper</strong>
+        <small>Submitted 5 reports</small>
+      </div>
+    )}
+
+    {resolvedReports >= 3 && (
+      <div className="badge-card">
+        <span>🟢</span>
+        <strong>Issue Solver</strong>
+        <small>Resolved 3 reports</small>
+      </div>
+    )}
+
+    {resolvedReports * 10 >= 100 && (
+      <div className="badge-card">
+        <span>⭐</span>
+        <strong>Campus Champion</strong>
+        <small>Reached 100 points</small>
+      </div>
+    )}
+
+    {issues.length === 0 && (
+      <p className="no-badges">
+        Submit your first report to unlock your first badge! 🚀
+      </p>
+    )}
+
+  </div>
+
+</div>
 
           {/* QUICK ACTIONS */}
 
@@ -336,6 +401,18 @@ console.log(issues);
   <section>
     <strong>Profile</strong>
     <span>Manage your account settings.</span>
+  </section>
+
+  <b>→</b>
+
+</Link>
+<Link to="/leaderboard" className="quick-card">
+
+  <div className="quick-icon">🏆</div>
+
+  <section>
+    <strong>Leaderboard</strong>
+    <span>See the top CampusPulse contributors.</span>
   </section>
 
   <b>→</b>

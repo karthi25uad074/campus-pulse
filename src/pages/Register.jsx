@@ -9,9 +9,10 @@ function Register() {
   const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = async (e) => {
+ const handleRegister = async (e) => {
   e.preventDefault();
 
+  // 1. Create Auth Account
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -23,12 +24,39 @@ function Register() {
     },
   });
 
+  console.log("SIGNUP DATA:", data);
+  console.log("SIGNUP ERROR:", error);
+
   if (error) {
     alert(error.message);
     return;
   }
 
-  alert("Registration Successful! Please check your email to verify your account.");
+  // 2. Add student to profiles table
+  if (data.user) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .insert({
+        id: data.user.id,
+        full_name: name,
+        student_id: studentId,
+        email: email,
+      });
+
+    console.log("PROFILE ERROR:", profileError);
+
+    if (profileError) {
+      alert("Account created, but profile could not be saved.");
+      console.log(profileError);
+      return;
+    }
+  }
+
+  // 3. Success
+  alert(
+    "Registration Successful!"
+  );
+
   navigate("/login");
 };
   return (
