@@ -97,7 +97,7 @@ console.log(issues);
       Student Dashboard
     </span>
 
-  <h1>{greeting}, {userName} 👋</h1>
+ <h1>{greeting}, {userName || "Student"} 👋</h1>
     <p>
       Manage campus issues, track report progress and help improve your campus with CampusPulse.
     </p>

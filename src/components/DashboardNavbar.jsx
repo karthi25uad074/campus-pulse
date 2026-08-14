@@ -5,6 +5,30 @@ function DashboardNavbar() {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const [userName, setUserName] = useState("");
+  const [userInitial, setUserInitial] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      // Get name from Supabase user metadata
+      const name =
+        user.user_metadata?.full_name ||
+        user.email?.split("@")[0] ||
+        "Student";
+
+      setUserName(name);
+      setUserInitial(name.charAt(0).toUpperCase());
+    };
+
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     const fetchNotifications = async () => {
       const {
@@ -77,7 +101,11 @@ function DashboardNavbar() {
 
                 <div className="no-notifications">
                   <div>🔔</div>
-                  <strong>No notifications yet</strong>
+
+                  <strong>
+                    No notifications yet
+                  </strong>
+
                   <p>
                     Updates about your reports will appear here.
                   </p>
@@ -133,16 +161,21 @@ function DashboardNavbar() {
 
         </div>
 
-        {/* USER */}
+        {/* USER PROFILE */}
         <div className="user-profile">
 
           <div className="user-avatar">
-            K
+            {userInitial || "S"}
           </div>
 
           <div>
-            <strong>Karthi</strong>
-            <small>Student</small>
+            <strong>
+              {userName || "Student"}
+            </strong>
+
+            <small>
+              Student
+            </small>
           </div>
 
         </div>

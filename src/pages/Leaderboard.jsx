@@ -6,76 +6,49 @@ import DashboardNavbar from "../components/DashboardNavbar";
 import "../styles/leaderboard.css";
 
 function Leaderboard() {
-
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
-const [currentUser, setCurrentUser] = useState(null);
-useEffect(() => {
-  const getCurrentUser = async () => {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [error, setError] = useState("");
 
-    setCurrentUser(user);
-  };
-
-  getCurrentUser();
-}, []);
+  // Get logged-in user
   useEffect(() => {
+    const getCurrentUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
+      setCurrentUser(user);
+    };
+
+    getCurrentUser();
+  }, []);
+
+  // Fetch leaderboard
+  useEffect(() => {
     const fetchLeaderboard = async () => {
+      setLoading(true);
+      setError("");
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, student_id");
+      const { data, error } = await supabase.rpc(
+        "get_leaderboard"
+      );
+
+      console.log("LEADERBOARD DATA:", data);
+      console.log("LEADERBOARD ERROR:", error);
 
       if (error) {
-        console.log(error);
+        console.error("Leaderboard error:", error);
+        setError(error.message);
         setLoading(false);
         return;
       }
 
-      const { data: reports, error: reportsError } = await supabase
-        .from("issues")
-        .select("user_id, status");
-
-      if (reportsError) {
-        console.log(reportsError);
-        setLoading(false);
-        return;
-      }
-
-      const result = data.map((student) => {
-
-        const studentReports = reports.filter(
-          (report) => report.user_id === student.id
-        );
-
-        const total = studentReports.length;
-
-        const resolved = studentReports.filter(
-          (report) => report.status === "Resolved"
-        ).length;
-
-        const points = total * 10 + resolved * 20;
-
-        return {
-          ...student,
-          reports: total,
-          resolved,
-          points,
-        };
-
-      });
-
-      result.sort((a, b) => b.points - a.points);
-
-      setLeaderboard(result);
+      setLeaderboard(data || []);
       setLoading(false);
     };
 
     fetchLeaderboard();
-
   }, []);
 
   return (
@@ -88,11 +61,18 @@ useEffect(() => {
         <DashboardNavbar />
 
         <section className="leaderboard-page">
-            <Link to="/dashboard" className="back-dashboard-btn">
-  ← Back to Dashboard
-</Link>
 
+          {/* BACK BUTTON */}
+          <Link
+            to="/dashboard"
+            className="back-dashboard-btn"
+          >
+            ← Back to Dashboard
+          </Link>
+
+          {/* HEADER */}
           <div className="leaderboard-header">
+
             <span>🏆 CAMPUS RANKINGS</span>
 
             <h1>Student Leaderboard</h1>
@@ -101,75 +81,137 @@ useEffect(() => {
               See the students making the biggest contribution
               to improving our campus.
             </p>
+
           </div>
 
-          {loading ? (
+          {/* LOADING */}
+          {loading && (
             <div className="leaderboard-loading">
               Loading leaderboard...
             </div>
-          ) : leaderboard.length === 0 ? (
-            <div className="leaderboard-empty">
-              No students found.
-            </div>
-          ) : (
-            <div className="leaderboard-list">
+          )}
 
-              {leaderboard.map((student, index) => (
+          {/* ERROR */}
+          {!loading && error && (
+            <div className="leaderboard-error">
+              <h3>⚠️ Unable to load leaderboard</h3>
 
-                <div
-  key={student.id}
-  className={`leaderboard-card ${
-    currentUser?.id === student.id ? "current-student" : ""
-  }`}
->
+              <p>{error}</p>
 
-                  <div className="leaderboard-rank">
-                    {index === 0
-                      ? "🥇"
-                      : index === 1
-                      ? "🥈"
-                      : index === 2
-                      ? "🥉"
-                      : `#${index + 1}`}
-                  </div>
-
-                  <div className="leaderboard-avatar">
-                    {student.full_name
-                      ?.charAt(0)
-                      .toUpperCase() || "S"}
-                  </div>
-
-                  <div className="leaderboard-info">
-
-                    <strong>
-  {student.full_name || "Student"}
-
-  {currentUser?.id === student.id && (
-    <span className="you-badge">You</span>
-  )}
-</strong>
-                    <small>
-                      {student.student_id}
-                    </small>
-
-                    <small>
-                      {student.reports} reports •{" "}
-                      {student.resolved} resolved
-                    </small>
-
-                  </div>
-
-                  <div className="leaderboard-points">
-                    ⭐ {student.points}
-                    <small>Points</small>
-                  </div>
-
-                </div>
-
-              ))}
-
+              <button
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </button>
             </div>
           )}
+
+          {/* EMPTY */}
+          {!loading &&
+            !error &&
+            leaderboard.length === 0 && (
+              <div className="leaderboard-empty">
+
+                <div className="empty-icon">
+                  🏆
+                </div>
+
+                <h3>No students found</h3>
+
+                <p>
+                  Students will appear here once their
+                  profiles are created.
+                </p>
+
+              </div>
+            )}
+
+          {/* LEADERBOARD */}
+          {!loading &&
+            !error &&
+            leaderboard.length > 0 && (
+
+              <div className="leaderboard-list">
+
+                {leaderboard.map((student, index) => (
+
+                  <div
+                    key={student.id}
+                    className={`leaderboard-card ${
+                      currentUser?.id === student.id
+                        ? "current-student"
+                        : ""
+                    }`}
+                  >
+
+                    {/* RANK */}
+                    <div className="leaderboard-rank">
+
+                      {index === 0
+                        ? "🥇"
+                        : index === 1
+                        ? "🥈"
+                        : index === 2
+                        ? "🥉"
+                        : `#${index + 1}`}
+
+                    </div>
+
+                    {/* AVATAR */}
+                    <div className="leaderboard-avatar">
+
+                      {student.full_name
+                        ?.charAt(0)
+                        .toUpperCase() || "S"}
+
+                    </div>
+
+                    {/* STUDENT INFO */}
+                    <div className="leaderboard-info">
+
+                      <strong>
+
+                        {student.full_name || "Student"}
+
+                        {currentUser?.id === student.id && (
+                          <span className="you-badge">
+                            You
+                          </span>
+                        )}
+
+                      </strong>
+
+                      <small>
+                        Student ID: {student.student_id}
+                      </small>
+
+                      <small>
+                        {student.reports || 0} reports
+                        {" • "}
+                        {student.resolved || 0} resolved
+                      </small>
+
+                    </div>
+
+                    {/* POINTS */}
+                    <div className="leaderboard-points">
+
+                      <strong>
+                        ⭐ {student.points || 0}
+                      </strong>
+
+                      <small>
+                        Points
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+              </div>
+            )}
 
         </section>
 
