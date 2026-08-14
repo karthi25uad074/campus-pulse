@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EditReport from "./pages/EditReport";
 import EvidenceViewer from "./pages/EvidenceViewer";
 import Leaderboard from "./pages/Leaderboard";
+import CampusMap from "./pages/CampusMap";
 
 function App() {
   return (
@@ -75,6 +76,7 @@ function App() {
   element={<EvidenceViewer />}
 />
 <Route path="/leaderboard" element={<Leaderboard />} />
+<Route path="/campus-map" element={<CampusMap />} />
       </Routes>
       <Toaster
   position="top-right"

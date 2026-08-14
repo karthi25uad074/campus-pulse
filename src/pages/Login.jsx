@@ -89,6 +89,13 @@ if (user.email === "admin@campuspulse.com") {
           <p className="auth-subtitle">
             Enter your details to access your account.
           </p>
+        <button
+  type="button"
+  className="login-back-btn"
+  onClick={() => navigate("/campus-map")}
+>
+  ← Back to Campus Map
+</button>
 
 
           <form onSubmit={handleLogin}>

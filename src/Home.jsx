@@ -75,9 +75,9 @@ function Home() {
                 Report an Issue →
             </Link>
 
-            <button className="secondary-btn">
-              Explore Campus
-            </button>
+           <Link to="/campus-map" className="explore-campus-btn">
+  🗺️ Explore Campus
+</Link>
           </div>
 
           <div className="hero-stats">
