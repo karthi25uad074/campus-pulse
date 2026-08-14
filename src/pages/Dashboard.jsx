@@ -9,6 +9,7 @@ import "../App.css";
 
 function Dashboard() {
   const [issues, setIssues] = useState([]);
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate();
   const [selectedIssue, setSelectedIssue] = useState(null);
   const totalReports = issues.length;
@@ -36,6 +37,13 @@ if (hour < 12) {
     } = await supabase.auth.getUser();
 
     if (!user) return;
+    const name =
+  user.user_metadata?.full_name ||
+  user.user_metadata?.name ||
+  user.email?.split("@")[0] ||
+  "Student";
+
+setUserName(name);
 
     const { data, error } = await supabase
       .from("issues")
@@ -75,7 +83,7 @@ console.log(issues);
       Student Dashboard
     </span>
 
-  <h1>{greeting}, Karthi 👋</h1>
+  <h1>{greeting}, {userName} 👋</h1>
     <p>
       Manage campus issues, track report progress and help improve your campus with CampusPulse.
     </p>
