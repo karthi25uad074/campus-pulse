@@ -15,8 +15,6 @@ import { supabase } from "../lib/supabase";
 import "leaflet/dist/leaflet.css";
 import "../styles/campus-map.css";
 
-const campusPosition = [9.6728, 77.9659];
-
 const campusIcon = L.divIcon({
   className: "campus-main-marker",
   html: `
@@ -27,6 +25,7 @@ const campusIcon = L.divIcon({
   iconAnchor: [25, 50],
   popupAnchor: [0, -48],
 });
+
 const issueIcon = (status, priority) => {
   let color = "#ef4444";
 
@@ -38,11 +37,7 @@ const issueIcon = (status, priority) => {
     color = "#22c55e";
   }
 
-  let size = 18;
-
-  if (priority === "High") {
-    size = 22;
-  }
+  const size = priority === "High" ? 22 : 18;
 
   return L.divIcon({
     className: "issue-map-marker",
@@ -64,6 +59,7 @@ const issueIcon = (status, priority) => {
     iconAnchor: [size / 2, size / 2],
   });
 };
+
 const placeIcon = (emoji) => {
   return L.divIcon({
     className: "campus-place-marker",
@@ -78,7 +74,8 @@ const placeIcon = (emoji) => {
     iconAnchor: [21, 21],
   });
 };
-function MapFocus({ location }) {
+
+function MapFocus({ location, userLocation }) {
   const map = useMap();
 
   useEffect(() => {
@@ -89,142 +86,223 @@ function MapFocus({ location }) {
     }
   }, [location, map]);
 
+  useEffect(() => {
+    if (userLocation) {
+      map.flyTo(userLocation, 18, {
+        duration: 1.2,
+      });
+    }
+  }, [userLocation, map]);
+
   return null;
 }
+
 function CampusMap() {
   const navigate = useNavigate();
+
   const [issues, setIssues] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("All");
-const [searchTerm, setSearchTerm] = useState("");
-const [selectedPlace, setSelectedPlace] = useState(null);
-const [userLocation, setUserLocation] = useState(null);
-const [locationLoading, setLocationLoading] = useState(false);
   const [loadingIssues, setLoadingIssues] = useState(true);
-   const campusPosition = [9.6728, 77.9659];
-  const locationCoordinates = {
-  "Boys Hostel": [9.6710556, 77.9639999],
-  "Stadium": [9.6727778, 77.9634722],
-  "Main Block": [9.6728333, 77.9653611],
-  "Girls Hostel": [9.6742500, 77.9638889],
-  "Laboratory": [9.6728333, 77.9645000],
-  "Departments": [9.6735833, 77.9646111],
-};
-const campusPlaces = [
-  {
-    id: 1,
-    name: "Boys Hostel",
-    category: "Hostel",
-    icon: "🏠",
-    position: [9.6710556, 77.9639999],
-  },
 
-  {
-    id: 2,
-    name: "Stadium",
-    category: "Sports",
-    icon: "🏟️",
-    position: [9.6727778, 77.9634722],
-  },
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  {
-    id: 3,
-    name: "Main Block",
-    category: "Academic",
-    icon: "🏫",
-    position: [9.6728333, 77.9653611],
-  },
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
-  {
-    id: 4,
-    name: "Girls Hostel",
-    category: "Hostel",
-    icon: "🏠",
-    position: [9.6742500, 77.9638889],
-  },
-
-  {
-    id: 5,
-    name: "Laboratory",
-    category: "Academic",
-    icon: "🧪",
-    position: [9.6728333, 77.9645000],
-  },
-
-  {
-    id: 6,
-    name: "Departments",
-    category: "Academic",
-    icon: "🏢",
-    position: [9.6735833, 77.9646111],
-  },
-];
-const campusBounds = campusPlaces.map((place) => place.position);
-   useEffect(() => {
-  const fetchIssues = async () => {
-    const { data, error } = await supabase
-      .from("issues")
-      .select(
-        "id, title, description, category, priority, location, status, created_at"
-      )
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.log("ISSUES ERROR:", error);
-      setLoadingIssues(false);
-      return;
-    }
-
-    setIssues(data || []);
-    setLoadingIssues(false);
-  };
-
-  fetchIssues();
-}, []);
-const getMyLocation = () => {
-  if (!navigator.geolocation) {
-    alert("Location is not supported by this browser.");
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [selectedPlacePhotos, setSelectedPlacePhotos] = useState(null);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  useEffect(() => {
+  if (
+    !selectedPlacePhotos ||
+    !selectedPlacePhotos.photos ||
+    selectedPlacePhotos.photos.length <= 1
+  ) {
     return;
   }
 
-  setLocationLoading(true);
+  const slideshow = setInterval(() => {
+    setActivePhotoIndex((prev) => {
+      const total = selectedPlacePhotos.photos.length;
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const coords = [
-        position.coords.latitude,
-        position.coords.longitude,
-      ];
+      return prev === total - 1 ? 0 : prev + 1;
+    });
+  }, 4000);
 
-      setUserLocation(coords);
-      setLocationLoading(false);
-    },
-    (error) => {
-      console.log("LOCATION ERROR:", error);
-      setLocationLoading(false);
+  return () => clearInterval(slideshow);
+}, [selectedPlacePhotos]);
 
-      alert(
-        "Unable to get your location. Please allow location permission."
-      );
+  const locationCoordinates = {
+    "Boys Hostel": [9.6710556, 77.9639999],
+    Stadium: [9.6727778, 77.9634722],
+    "Main Block": [9.6728333, 77.9653611],
+    "Girls Hostel": [9.67425, 77.9638889],
+    Laboratory: [9.6728333, 77.9645],
+    Departments: [9.6735833, 77.9646111],
+  };
+
+  const campusPlaces = [
+    {
+      id: 1,
+      name: "Boys Hostel",
+      category: "Hostel",
+      icon: "🏠",
+      position: [9.6710556, 77.9639999],
     },
     {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0,
+      id: 2,
+      name: "Stadium",
+      category: "Sports",
+      icon: "🏟️",
+      position: [9.6727778, 77.9634722],
+    },
+    {
+  id: 3,
+  name: "Main Block",
+  category: "Academic",
+  icon: "🏫",
+  position: [9.6728333, 77.9653611],
+
+  photos: [
+  "https://images.unsplash.com/photo-1562774053-701939374585?w=1200",
+  "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200"
+],
+},
+    {
+      id: 4,
+      name: "Girls Hostel",
+      category: "Hostel",
+      icon: "🏠",
+      position: [9.67425, 77.9638889],
+    },
+    {
+      id: 5,
+      name: "Laboratory",
+      category: "Academic",
+      icon: "🧪",
+      position: [9.6728333, 77.9645],
+    },
+    {
+      id: 6,
+      name: "Departments_block-A",
+      category: "Academic",
+      icon: "🏢",
+      position: [9.6735833, 77.9646111],
+    },
+    {
+  id: 7,
+  name: "Temple",
+  category: "Spiritual",
+  icon: "🛕",
+  position: [9.6724722, 77.9659722],
+},
+{
+  id: 8,
+  name: "Parents Paradise",
+  category: "Recreation",
+  icon: "🌴",
+  position: [9.6734167, 77.96575],
+},
+{
+  id: 9,
+  name: "Canteen",
+  category: "Food",
+  icon: "🍴",
+  position: [9.6724444, 77.9640833],
+},
+{
+  id: 10,
+  name: "Departments_block-B",
+  category: "Academic",
+  icon: "🏢",
+  position: [9.6718889, 77.9645],
+},
+  ];
+
+  const campusBounds = campusPlaces.map(
+    (place) => place.position
+  );
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      const { data, error } = await supabase
+        .from("issues")
+        .select(
+          "id, title, description, category, priority, location, status, created_at"
+        )
+        .order("created_at", {
+          ascending: false,
+        });
+
+      if (error) {
+        console.log("ISSUES ERROR:", error);
+        setLoadingIssues(false);
+        return;
+      }
+
+      setIssues(data || []);
+      setLoadingIssues(false);
+    };
+
+    fetchIssues();
+  }, []);
+
+  const getMyLocation = () => {
+    if (!navigator.geolocation) {
+      alert(
+        "Location is not supported by this browser."
+      );
+      return;
+    }
+
+    setLocationLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = [
+          position.coords.latitude,
+          position.coords.longitude,
+        ];
+
+        setUserLocation(coords);
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.log("LOCATION ERROR:", error);
+
+        setLocationLoading(false);
+
+        alert(
+          "Unable to get your location. Please allow location permission."
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
+
+  const filteredPlaces = campusPlaces.filter(
+    (place) => {
+      const matchesCategory =
+        activeCategory === "All" ||
+        place.category === activeCategory;
+
+      const matchesSearch =
+        place.name
+          .toLowerCase()
+          .includes(
+            searchTerm.toLowerCase()
+          );
+
+      return (
+        matchesCategory &&
+        matchesSearch
+      );
     }
   );
-};
-const filteredPlaces = campusPlaces.filter((place) => {
-  const matchesCategory =
-    activeCategory === "All" ||
-    place.category === activeCategory;
-
-  const matchesSearch =
-    place.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
-  return matchesCategory && matchesSearch;
-});
 
   return (
     <div className="campus-explorer">
@@ -232,125 +310,106 @@ const filteredPlaces = campusPlaces.filter((place) => {
       {/* MAP */}
 
       <MapContainer
-  bounds={campusBounds}
-  boundsOptions={{
-    padding: [50, 50],
-  }}
-  zoomControl={false}
-  className="campus-leaflet-map"
->
-<MapFocus location={selectedPlace} />
+        bounds={campusBounds}
+        boundsOptions={{
+          padding: [50, 50],
+        }}
+        zoomControl={false}
+        className="campus-leaflet-map"
+      >
+
+        <MapFocus
+          location={selectedPlace}
+          userLocation={userLocation}
+        />
 
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors'
+          attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
         <ZoomControl position="bottomright" />
-        <MapFocus
-  location={selectedPlace}
-  userLocation={userLocation}
-/>
-{userLocation && (
-  <CircleMarker
-    center={userLocation}
-    radius={8}
-    pathOptions={{
-      color: "#ffffff",
-      fillColor: "#2563eb",
-      fillOpacity: 1,
-      weight: 3,
-    }}
-  >
-    <Popup>
-      <strong>You are here</strong>
-    </Popup>
-  </CircleMarker>
-)}
+
+        {/* USER LOCATION */}
+
+        {userLocation && (
+          <CircleMarker
+            center={userLocation}
+            radius={8}
+            pathOptions={{
+              color: "#ffffff",
+              fillColor: "#2563eb",
+              fillOpacity: 1,
+              weight: 3,
+            }}
+          >
+            <Popup>
+              <strong>You are here</strong>
+            </Popup>
+          </CircleMarker>
+        )}
+
+        {/* CAMPUS PLACES */}
 
         {filteredPlaces.map((place) => (
-  <Marker
-  key={place.id}
-  position={place.position}
-  icon={placeIcon(place.icon)}
-  eventHandlers={{
-    click: () => setSelectedPlace(place.position),
+          <Marker
+            key={place.id}
+            position={place.position}
+            icon={placeIcon(place.icon)}
+            eventHandlers={{
+              click: () =>
+                setSelectedPlace(
+                  place.position
+                ),
+            }}
+          >
+            <Popup>
+  <div className="place-popup">
+
+    <div className="place-popup-icon">
+      {place.icon}
+    </div>
+
+    <div className="place-popup-content">
+      <strong>
+        {place.name}
+      </strong>
+
+      <span>
+        {place.category}
+      </span>
+
+      <button
+  className="view-photos-btn"
+  onClick={() => {
+    setSelectedPlacePhotos(place);
+    setActivePhotoIndex(0);
   }}
 >
-    <Popup>
-      <div className="place-popup">
+  📸 View Photos
+</button>
+    </div>
 
-        <div className="place-popup-icon">
-          {place.icon}
-        </div>
+  </div>
+</Popup>
+          </Marker>
+        ))}
 
-        <div>
-          <strong>{place.name}</strong>
+        {/* CAMPUS MAIN MARKER */}
 
-          <span>{place.category}</span>
-
-          <small>
-            Campus location
-          </small>
-        </div>
-
-      </div>
-    </Popup>
-  </Marker>
-))}
         <Marker
-          position={campusPosition}
+          position={[
+            9.6728,
+            77.9659,
+          ]}
           icon={campusIcon}
         >
-
-            {issues.map((issue) => {
-  const position = locationCoordinates[issue.location];
-
-  if (!position) return null;
-
-  return (
-    <Marker
-      key={issue.id}
-      position={position}
-     icon={issueIcon(issue.status, issue.priority)}
-    >
-      <Popup>
-        <div className="campus-popup">
-
-          <div className="popup-icon">
-            {issue.status === "Resolved"
-              ? "🟢"
-              : issue.status === "In Progress"
-              ? "🟠"
-              : "🔴"}
-          </div>
-
-          <div>
-            <strong>{issue.title}</strong>
-
-            <span>
-              {issue.location}
-            </span>
-
-            <small>
-              Status: {issue.status}
-            </small>
-
-            <small>
-              Priority: {issue.priority}
-            </small>
-
-          </div>
-
-        </div>
-      </Popup>
-    </Marker>
-  );
-})}
           <Popup>
             <div className="campus-popup">
 
-              <div className="popup-icon">🏫</div>
+              <div className="popup-icon">
+                🏫
+              </div>
 
               <div>
                 <strong>
@@ -359,11 +418,13 @@ const filteredPlaces = campusPlaces.filter((place) => {
                 </strong>
 
                 <span>
-                  S.P.G.C. Nagar, K. Vellakulam
+                  S.P.G.C. Nagar,
+                  K. Vellakulam
                 </span>
 
                 <small>
-                  Near Virudhunagar, Tamil Nadu
+                  Near Virudhunagar,
+                  Tamil Nadu
                 </small>
               </div>
 
@@ -371,19 +432,77 @@ const filteredPlaces = campusPlaces.filter((place) => {
           </Popup>
         </Marker>
 
+        {/* ISSUE MARKERS */}
+
+        {!loadingIssues &&
+          issues.map((issue) => {
+            const position =
+              locationCoordinates[
+                issue.location
+              ];
+
+            if (!position) {
+              return null;
+            }
+
+            return (
+              <Marker
+                key={issue.id}
+                position={position}
+                icon={issueIcon(
+                  issue.status,
+                  issue.priority
+                )}
+              >
+                <Popup>
+                  <div className="campus-popup">
+
+                    <div className="popup-icon">
+                      {issue.status ===
+                      "Resolved"
+                        ? "🟢"
+                        : issue.status ===
+                          "In Progress"
+                        ? "🟠"
+                        : "🔴"}
+                    </div>
+
+                    <div>
+                      <strong>
+                        {issue.title}
+                      </strong>
+
+                      <span>
+                        {issue.location}
+                      </span>
+
+                      <small>
+                        Status:{" "}
+                        {issue.status}
+                      </small>
+
+                      <small>
+                        Priority:{" "}
+                        {issue.priority}
+                      </small>
+                    </div>
+
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+
       </MapContainer>
-
-
-      {/* DARK MAP OVERLAY */}
-
-      <div className="map-dark-overlay"></div>
-
 
       {/* TOP BAR */}
 
       <div className="map-topbar">
 
-        <Link to="/" className="map-brand">
+        <Link
+          to="/"
+          className="map-brand"
+        >
           <div className="map-brand-icon">
             CP
           </div>
@@ -393,35 +512,26 @@ const filteredPlaces = campusPlaces.filter((place) => {
           </span>
         </Link>
 
-
         <div className="map-search">
 
           <span>⌕</span>
 
-         <input
-  type="text"
-  placeholder="Search campus locations..."
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-/>
+          <input
+            type="text"
+            placeholder="Search campus locations..."
+            value={searchTerm}
+            onChange={(e) =>
+              setSearchTerm(
+                e.target.value
+              )
+            }
+          />
+
           <kbd>⌘ K</kbd>
 
         </div>
 
-
-        <button
-          className="map-profile"
-          onClick={() => navigate("/profile")}
-        >
-          <div className="map-profile-avatar">
-            K
-          </div>
-
-          <span>Profile</span>
-        </button>
-
       </div>
-
 
       {/* BACK BUTTON */}
 
@@ -433,7 +543,6 @@ const filteredPlaces = campusPlaces.filter((place) => {
         Back
       </button>
 
-
       {/* LEFT FLOATING PANEL */}
 
       <aside className="map-control-panel">
@@ -441,6 +550,7 @@ const filteredPlaces = campusPlaces.filter((place) => {
         <div className="map-panel-header">
 
           <div>
+
             <span className="map-eyebrow">
               EXPLORE CAMPUS
             </span>
@@ -450,9 +560,10 @@ const filteredPlaces = campusPlaces.filter((place) => {
             </h1>
 
             <p>
-              Discover locations and campus
-              facilities.
+              Discover campus
+              locations and facilities.
             </p>
+
           </div>
 
           <div className="live-indicator">
@@ -461,107 +572,89 @@ const filteredPlaces = campusPlaces.filter((place) => {
           </div>
 
         </div>
-<div className="map-category-filter">
 
-  <div className="filter-title">
-    Explore
-  </div>
+        {/* CATEGORY FILTER */}
 
-  <div className="filter-buttons">
+        <div className="map-category-filter">
 
-    {[
-      "All",
-      "Academic",
-      "Hostel",
-      "Sports",
-    ].map((category) => (
-      <button
-        key={category}
-        className={
-          activeCategory === category
-            ? "active"
-            : ""
-        }
-        onClick={() => setActiveCategory(category)}
-      >
-        {category}
-      </button>
-    ))}
+          <div className="filter-title">
+            Explore
+          </div>
 
-  </div>
+          <div className="filter-buttons">
 
-</div>
+            {[
+  "All",
+  "Academic",
+  "Hostel",
+  "Sports",
+  "Food",
+  "Spiritual",
+  "Recreation",
+].map((category) => (
+              <button
+                key={category}
+                className={
+                  activeCategory ===
+                  category
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setActiveCategory(
+                    category
+                  )
+                }
+              >
+                {category}
+              </button>
+            ))}
 
-        {/* QUICK ACTIONS */}
+          </div>
+
+        </div>
+
+        {/* MY LOCATION */}
 
         <div className="map-actions">
 
           <button
-            onClick={() => navigate("/report")}
-            className="map-report-button"
+            className="map-location-btn"
+            onClick={getMyLocation}
+            disabled={locationLoading}
           >
-            <div className="action-icon">
-              +
-            </div>
+            {locationLoading
+              ? "⏳"
+              : "📍"}
 
-            <div>
-              <strong>Report an Issue</strong>
-              <small>
-                Report something near you
-              </small>
-            </div>
-
-            <span>→</span>
-          </button>
-
-
-          <button
-            className="map-location-button"
-            onClick={() => {
-              navigator.geolocation?.getCurrentPosition(
-                (position) => {
-                  console.log(
-                    position.coords.latitude,
-                    position.coords.longitude
-                  );
-                }
-              );
-            }}
-          >
-            <div className="location-icon">
-              ◎
-            </div>
-
-           <button
-  className="map-location-btn"
-  onClick={getMyLocation}
-  disabled={locationLoading}
->
-  {locationLoading ? "⏳" : "📍"}
-  <span>
-    {locationLoading
-      ? "Locating..."
-      : "My Location"}
-  </span>
-</button>
-
-            <span>⌖</span>
+            <span>
+              {locationLoading
+                ? "Locating..."
+                : "My Location"}
+            </span>
           </button>
 
         </div>
-
 
         {/* CAMPUS INFO */}
 
         <div className="campus-info-card">
 
           <div className="info-card-top">
+
             <span>📍</span>
 
             <div>
-              <strong>KCET Campus</strong>
-              <small>Virudhunagar, Tamil Nadu</small>
+              <strong>
+                KCET Campus
+              </strong>
+
+              <small>
+                Virudhunagar,
+                Tamil Nadu
+              </small>
             </div>
+
           </div>
 
           <div className="info-divider"></div>
@@ -569,94 +662,168 @@ const filteredPlaces = campusPlaces.filter((place) => {
           <div className="info-stats">
 
             <div>
-              <strong>Campus</strong>
-              <span>Explore</span>
+              <strong>
+                Campus
+              </strong>
+
+              <span>
+                Explore
+              </span>
             </div>
 
             <div>
-              <strong>Map</strong>
-              <span>Live</span>
+              <strong>
+                Map
+              </strong>
+
+              <span>
+                Live
+              </span>
             </div>
 
-          </div>
-
-        </div>
-
-
-        {/* LEGEND */}
-
-        <div className="map-legend">
-
-          <div className="legend-title">
-            Map Legend
-          </div>
-
-          <div className="legend-item">
-            <span className="legend-dot issue-high"></span>
-            Active Issues
-          </div>
-
-          <div className="legend-item">
-            <span className="legend-dot issue-progress"></span>
-            In Progress
-          </div>
-
-          <div className="legend-item">
-            <span className="legend-dot issue-resolved"></span>
-            Resolved
           </div>
 
         </div>
 
       </aside>
+{selectedPlacePhotos && (
+  <div
+    className="place-photo-modal"
+    onClick={() =>
+      setSelectedPlacePhotos(null)
+    }
+  >
+    <div
+      className="place-photo-modal-content"
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+    >
+      <button
+        className="photo-modal-close"
+        onClick={() =>
+          setSelectedPlacePhotos(null)
+        }
+      >
+        ✕
+      </button>
 
+      <div className="photo-gallery">
 
-      {/* RIGHT MAP CONTROLS */}
+  {selectedPlacePhotos.photos?.length > 0 ? (
+    <>
+      <img
+  key={activePhotoIndex}
+  src={selectedPlacePhotos.photos[activePhotoIndex]}
+  alt={selectedPlacePhotos.name}
+  className="photo-gallery-image"
+/>
+<div className="photo-place-overlay">
+  <div className="photo-place-overlay-category">
+    {selectedPlacePhotos.category}
+  </div>
 
-      <div className="map-floating-controls">
+  <div className="photo-place-overlay-name">
+    {selectedPlacePhotos.name}
+  </div>
 
-        <button title="My location">
-          ◎
-        </button>
+  <div className="photo-place-overlay-description">
+    Explore this campus location
+  </div>
+</div>
 
-        <button title="Fullscreen">
-          ⛶
-        </button>
-
-      </div>
-
-
-      {/* BOTTOM INFO */}
-
-      <div className="map-bottom-bar">
-
-        <div className="map-coordinates">
-          <span className="coordinate-dot"></span>
-
-          <span>
-            K. Vellakulam · Virudhunagar
-          </span>
-        </div>
-
-
-        <div className="map-bottom-actions">
+      {selectedPlacePhotos.photos.length > 1 && (
+        <>
 
           <button
-            onClick={() => navigate("/dashboard")}
+            className="photo-nav photo-prev"
+            onClick={() =>
+              setActivePhotoIndex(
+                (prev) =>
+                  prev === 0
+                    ? selectedPlacePhotos.photos.length - 1
+                    : prev - 1
+              )
+            }
           >
-            Dashboard
+            ‹
           </button>
 
           <button
-            onClick={() => navigate("/my-reports")}
+            className="photo-nav photo-next"
+            onClick={() =>
+              setActivePhotoIndex(
+                (prev) =>
+                  prev ===
+                  selectedPlacePhotos.photos.length - 1
+                    ? 0
+                    : prev + 1
+              )
+            }
           >
-            My Reports
+            ›
           </button>
 
-        </div>
+          <div className="photo-counter">
+            {activePhotoIndex + 1} /{" "}
+            {selectedPlacePhotos.photos.length}
+          </div>
+          <div className="photo-thumbnails">
+  {selectedPlacePhotos.photos.map((photo, index) => (
+    <button
+      key={index}
+      className={`photo-thumbnail ${
+        activePhotoIndex === index ? "active" : ""
+      }`}
+      onClick={() => setActivePhotoIndex(index)}
+    >
+      <img
+        src={photo}
+        alt={`${selectedPlacePhotos.name} ${index + 1}`}
+      />
+    </button>
+  ))}
+</div>
 
+        </>
+      )}
+
+    </>
+  ) : (
+    <div className="photo-no-image">
+      <span>
+        {selectedPlacePhotos.icon}
+      </span>
+
+      <strong>
+        No photos available
+      </strong>
+
+      <p>
+        Photos will be added soon.
+      </p>
+    </div>
+  )}
+
+</div>
+
+      <div className="photo-modal-info">
+        <span>
+          {selectedPlacePhotos.category}
+        </span>
+
+        <h2>
+          {selectedPlacePhotos.name}
+        </h2>
+
+        <p>
+          Campus photos will appear here.
+        </p>
       </div>
 
+    </div>
+  </div>
+)}
     </div>
   );
 }
