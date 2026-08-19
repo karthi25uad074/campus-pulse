@@ -135,24 +135,39 @@ const deleteReport = async (id) => {
 
         <section className="dashboard-content">
 
-         <div className="admin-header">
+   <div className="admin-header">
 
   <div>
-
     <h1>Admin Dashboard</h1>
 
     <p>
       Monitor and manage all campus reports.
     </p>
-
   </div>
 
-  <div className="admin-badge">
-    Administrator
+  <div className="admin-header-actions">
+
+    <button
+      className="admin-explore-btn"
+      onClick={() => navigate("/admin/explore-campus")}
+    >
+      <span className="explore-icon">🗺️</span>
+
+      <span>
+        <strong>Explore Campus</strong>
+        <small>Manage campus places & photos</small>
+      </span>
+
+      <span className="explore-arrow">→</span>
+    </button>
+
+    <div className="admin-badge">
+      Administrator
+    </div>
+
   </div>
 
 </div>
-
           <div className="stats-grid">
 
             <div className="stat-card">

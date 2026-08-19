@@ -112,6 +112,9 @@ function CampusMap() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [selectedPlacePhotos, setSelectedPlacePhotos] = useState(null);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [selectedDepartmentBlock, setSelectedDepartmentBlock] = useState(null);
+const [selectedDepartment, setSelectedDepartment] = useState(null);
+const [selectedLaboratory, setSelectedLaboratory] = useState(null);
   useEffect(() => {
   if (
     !selectedPlacePhotos ||
@@ -140,7 +143,130 @@ function CampusMap() {
     Laboratory: [9.6728333, 77.9645],
     Departments: [9.6735833, 77.9646111],
   };
+const departmentBlocks = [
+  {
+    id: "block-a",
+    name: "Department Block A",
+    departments: [
+      {
+  id: "cse",
+  name: "Computer Science & Engineering",
+  shortName: "CSE",
+  icon: "💻",
+ photos: [],
+},
+      {
+        id: "it",
+        name: "Information Technology",
+        shortName: "IT",
+        icon: "🖥️",
+        photos: []
+      },
+      {
+  id: "ece",
+  name: "Electronics & Communication Engineering",
+  shortName: "ECE",
+  icon: "📡",
+  photos: [
+    "/campus/ece-1.jpg",
+    "/campus/ece-2.jpg"
+  ]
+},
+      {
+        id: "ads",
+        name: "Artificial Intelligence & Data Science",
+        shortName: "AI & DS",
+        icon: "🤖",
+        photos: []
+      },
+      {
+        id: "eee",
+        name: "Electrical & Electronics Engineering",
+        shortName: "EEE",
+        icon: "⚡",
+        photos: []
+      }
+    ]
+  },
 
+  {
+    id: "block-b",
+    name: "Department Block B",
+    departments: [
+      {
+        id: "mech",
+        name: "Mechanical Engineering",
+        shortName: "Mech",
+        icon: "⚙️",
+        photos: []
+      },
+      {
+        id: "civil",
+        name: "Civil Engineering",
+        shortName: "Civil",
+        icon: "🏗️",
+        photos: []
+      },
+      {
+        id: "metr",
+        name: "Metallurgical Engineering",
+        shortName: "METR",
+        icon: "🔩",
+        photos: []
+      }
+    ]
+  }
+];
+const laboratoryList = [
+ {
+  id: "mechanical",
+  name: "Mechanical Laboratory",
+  shortName: "Mechanical",
+  icon: "⚙️",
+  photos: [
+    "/campus/mechanical-lab-1.jpg",
+    "/campus/mechanical-lab-2.jpg"
+  ]
+},
+  {
+    id: "eee",
+    name: "EEE Laboratory",
+    shortName: "EEE",
+    icon: "⚡",
+    photos: []
+  },
+  {
+    id: "ece",
+    name: "ECE Laboratory",
+    shortName: "ECE",
+    icon: "📡",
+    photos: []
+  },
+  {
+    id: "chemistry",
+    name: "Chemistry Laboratory",
+    shortName: "Chemistry",
+    icon: "🧪",
+    photos: []
+  },
+  {
+    id: "polymer",
+    name: "Polymer Laboratory",
+    shortName: "Polymer",
+    icon: "🔬",
+    photos: []
+  },
+  {
+  id: "physics",
+  name: "Physics Laboratory",
+  shortName: "Physics",
+  icon: "⚛️",
+  photos: [
+    "/campus/physics-1.jpg",
+    "/campus/physics-2.jpg"
+  ]
+}
+];
   const campusPlaces = [
     {
       id: 1,
@@ -156,17 +282,20 @@ function CampusMap() {
       icon: "🏟️",
       position: [9.6727778, 77.9634722],
     },
-    {
+   {
   id: 3,
   name: "Main Block",
   category: "Academic",
   icon: "🏫",
   position: [9.6728333, 77.9653611],
 
+  description:
+    "The main academic block of the campus.",
+    
   photos: [
-  "https://images.unsplash.com/photo-1562774053-701939374585?w=1200",
-  "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200"
-],
+    "https://images.unsplash.com/photo-1562774053-701939374585?w=1200",
+    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200"
+  ],
 },
     {
       id: 4,
@@ -378,12 +507,50 @@ function CampusMap() {
       <span>
         {place.category}
       </span>
-
-      <button
+<button
   className="view-photos-btn"
   onClick={() => {
-    setSelectedPlacePhotos(place);
-    setActivePhotoIndex(0);
+
+    if (place.name === "Departments_block-A") {
+
+      setSelectedDepartmentBlock(
+        departmentBlocks.find(
+          (block) => block.id === "block-a"
+        )
+      );
+
+      setSelectedDepartment(null);
+      setSelectedPlacePhotos(place);
+      setActivePhotoIndex(0);
+
+    } else if (place.name === "Departments_block-B") {
+
+      setSelectedDepartmentBlock(
+        departmentBlocks.find(
+          (block) => block.id === "block-b"
+        )
+      );
+
+      setSelectedDepartment(null);
+      setSelectedPlacePhotos(place);
+      setActivePhotoIndex(0);
+
+    } else if (place.name === "Laboratory") {
+
+      setSelectedDepartmentBlock(null);
+      setSelectedDepartment(null);
+      setSelectedPlacePhotos(place);
+      setActivePhotoIndex(0);
+
+    } else {
+
+      setSelectedDepartmentBlock(null);
+      setSelectedDepartment(null);
+      setSelectedPlacePhotos(place);
+      setActivePhotoIndex(0);
+
+    }
+
   }}
 >
   📸 View Photos
@@ -689,9 +856,13 @@ function CampusMap() {
 {selectedPlacePhotos && (
   <div
     className="place-photo-modal"
-    onClick={() =>
-      setSelectedPlacePhotos(null)
-    }
+   onClick={() => {
+  setSelectedPlacePhotos(null);
+  setSelectedDepartmentBlock(null);
+  setSelectedDepartment(null);
+  setSelectedLaboratory(null);
+  setActivePhotoIndex(0);
+}}
   >
     <div
       className="place-photo-modal-content"
@@ -708,91 +879,301 @@ function CampusMap() {
         ✕
       </button>
 
-      <div className="photo-gallery">
+ <div className="photo-gallery">
 
-  {selectedPlacePhotos.photos?.length > 0 ? (
+  {/* ================= DEPARTMENT SELECTOR ================= */}
+
+  {selectedDepartmentBlock && !selectedDepartment && (
+    <div className="department-selector">
+
+      <div className="department-selector-header">
+        <span>DEPARTMENTS</span>
+
+        <h2>
+          {selectedDepartmentBlock.name}
+        </h2>
+
+        <p>
+          Select a department to view its photos.
+        </p>
+      </div>
+
+      <div className="department-grid">
+
+        {selectedDepartmentBlock.departments.map((dept) => (
+
+          <button
+            key={dept.id}
+            className="department-card"
+            onClick={() => {
+              setSelectedDepartment(dept);
+              setActivePhotoIndex(0);
+            }}
+          >
+
+            <div className="department-card-icon">
+              {dept.icon}
+            </div>
+
+            <div className="department-card-info">
+
+              <strong>
+                {dept.shortName}
+              </strong>
+
+              <small>
+                {dept.name}
+              </small>
+
+            </div>
+
+            <span>→</span>
+
+          </button>
+
+        ))}
+
+      </div>
+
+    </div>
+  )}
+
+
+  {/* ================= LABORATORY SELECTOR ================= */}
+
+  {!selectedDepartmentBlock &&
+    !selectedLaboratory &&
+    selectedPlacePhotos?.name === "Laboratory" && (
+
+    <div className="department-selector">
+
+      <div className="department-selector-header">
+        <span>LABORATORIES</span>
+
+        <h2>
+          Campus Laboratories
+        </h2>
+
+        <p>
+          Select a laboratory to view its photos.
+        </p>
+      </div>
+
+      <div className="department-grid">
+
+        {laboratoryList.map((lab) => (
+
+          <button
+            key={lab.id}
+            className="department-card"
+            onClick={() => {
+              setSelectedLaboratory(lab);
+              setActivePhotoIndex(0);
+            }}
+          >
+
+            <div className="department-card-icon">
+              {lab.icon}
+            </div>
+
+            <div className="department-card-info">
+
+              <strong>
+                {lab.shortName}
+              </strong>
+
+              <small>
+                {lab.name}
+              </small>
+
+            </div>
+
+            <span>→</span>
+
+          </button>
+
+        ))}
+
+      </div>
+
+    </div>
+  )}
+
+
+  {/* ================= PHOTO GALLERY ================= */}
+
+  {(
+    selectedDepartment?.photos?.length > 0 ||
+    selectedLaboratory?.photos?.length > 0 ||
+    (
+      !selectedDepartmentBlock &&
+      !selectedLaboratory &&
+      selectedPlacePhotos?.photos?.length > 0
+    )
+  ) && (
+
     <>
+
       <img
-  key={activePhotoIndex}
-  src={selectedPlacePhotos.photos[activePhotoIndex]}
-  alt={selectedPlacePhotos.name}
-  className="photo-gallery-image"
-/>
-<div className="photo-place-overlay">
-  <div className="photo-place-overlay-category">
-    {selectedPlacePhotos.category}
-  </div>
+        key={activePhotoIndex}
+        src={
+          selectedDepartment
+            ? selectedDepartment.photos[activePhotoIndex]
+            : selectedLaboratory
+            ? selectedLaboratory.photos[activePhotoIndex]
+            : selectedPlacePhotos.photos[activePhotoIndex]
+        }
+        alt={
+          selectedDepartment?.name ||
+          selectedLaboratory?.name ||
+          selectedPlacePhotos?.name
+        }
+        className="photo-gallery-image"
+      />
 
-  <div className="photo-place-overlay-name">
-    {selectedPlacePhotos.name}
-  </div>
+      <div className="photo-place-overlay">
 
-  <div className="photo-place-overlay-description">
-    Explore this campus location
-  </div>
-</div>
+        <div className="photo-place-overlay-category">
+          {selectedDepartment
+            ? "DEPARTMENT"
+            : selectedLaboratory
+            ? "LABORATORY"
+            : selectedPlacePhotos.category}
+        </div>
 
-      {selectedPlacePhotos.photos.length > 1 && (
+        <div className="photo-place-overlay-name">
+          {selectedDepartment?.name ||
+            selectedLaboratory?.name ||
+            selectedPlacePhotos.name}
+        </div>
+
+      </div>
+
+
+      {/* PREVIOUS */}
+
+      {(
+        selectedDepartment?.photos?.length ||
+        selectedLaboratory?.photos?.length ||
+        selectedPlacePhotos?.photos?.length
+      ) > 1 && (
+
         <>
 
           <button
             className="photo-nav photo-prev"
             onClick={() =>
-              setActivePhotoIndex(
-                (prev) =>
-                  prev === 0
-                    ? selectedPlacePhotos.photos.length - 1
-                    : prev - 1
-              )
+              setActivePhotoIndex((prev) => {
+
+                const photos =
+                  selectedDepartment?.photos ||
+                  selectedLaboratory?.photos ||
+                  selectedPlacePhotos.photos;
+
+                return prev === 0
+                  ? photos.length - 1
+                  : prev - 1;
+
+              })
             }
           >
             ‹
           </button>
 
+
+          {/* NEXT */}
+
           <button
             className="photo-nav photo-next"
             onClick={() =>
-              setActivePhotoIndex(
-                (prev) =>
-                  prev ===
-                  selectedPlacePhotos.photos.length - 1
-                    ? 0
-                    : prev + 1
-              )
+              setActivePhotoIndex((prev) => {
+
+                const photos =
+                  selectedDepartment?.photos ||
+                  selectedLaboratory?.photos ||
+                  selectedPlacePhotos.photos;
+
+                return prev === photos.length - 1
+                  ? 0
+                  : prev + 1;
+
+              })
             }
           >
             ›
           </button>
 
+
+          {/* COUNTER */}
+
           <div className="photo-counter">
+
             {activePhotoIndex + 1} /{" "}
-            {selectedPlacePhotos.photos.length}
+
+            {
+              (
+                selectedDepartment?.photos ||
+                selectedLaboratory?.photos ||
+                selectedPlacePhotos.photos
+              ).length
+            }
+
           </div>
+
+
+          {/* THUMBNAILS */}
+
           <div className="photo-thumbnails">
-  {selectedPlacePhotos.photos.map((photo, index) => (
-    <button
-      key={index}
-      className={`photo-thumbnail ${
-        activePhotoIndex === index ? "active" : ""
-      }`}
-      onClick={() => setActivePhotoIndex(index)}
-    >
-      <img
-        src={photo}
-        alt={`${selectedPlacePhotos.name} ${index + 1}`}
-      />
-    </button>
-  ))}
-</div>
+
+            {(
+              selectedDepartment?.photos ||
+              selectedLaboratory?.photos ||
+              selectedPlacePhotos.photos
+            ).map((photo, index) => (
+
+              <button
+                key={index}
+                className={`photo-thumbnail ${
+                  activePhotoIndex === index
+                    ? "active"
+                    : ""
+                }`}
+                onClick={() =>
+                  setActivePhotoIndex(index)
+                }
+              >
+
+                <img
+                  src={photo}
+                  alt={`Photo ${index + 1}`}
+                />
+
+              </button>
+
+            ))}
+
+          </div>
 
         </>
+
       )}
 
     </>
-  ) : (
+
+  )}
+
+
+  {/* ================= EMPTY ================= */}
+
+  {!selectedDepartmentBlock &&
+    !selectedLaboratory &&
+    !selectedDepartment &&
+    !selectedPlacePhotos?.photos?.length && (
+
     <div className="photo-no-image">
+
       <span>
-        {selectedPlacePhotos.icon}
+        {selectedPlacePhotos?.icon}
       </span>
 
       <strong>
@@ -802,24 +1183,12 @@ function CampusMap() {
       <p>
         Photos will be added soon.
       </p>
+
     </div>
+
   )}
 
 </div>
-
-      <div className="photo-modal-info">
-        <span>
-          {selectedPlacePhotos.category}
-        </span>
-
-        <h2>
-          {selectedPlacePhotos.name}
-        </h2>
-
-        <p>
-          Campus photos will appear here.
-        </p>
-      </div>
 
     </div>
   </div>
