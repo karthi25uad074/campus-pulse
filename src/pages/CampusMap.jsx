@@ -1,1152 +1,222 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  ZoomControl,
-  CircleMarker,
-  useMap,
-} from "react-leaflet";
-import L from "leaflet";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/admin-explore.css";
 
-import { supabase } from "../lib/supabase";
-import "leaflet/dist/leaflet.css";
-import "../styles/campus-map.css";
+const campusPlaces = [
+  {
+    id: "main-block",
+    name: "Main Block",
+    category: "Academic",
+    icon: "🏫",
+    type: "place",
+  },
 
-const campusIcon = L.divIcon({
-  className: "campus-main-marker",
-  html: `
-    <div class="main-marker-pulse"></div>
-    <div class="main-marker-pin">📍</div>
-  `,
-  iconSize: [50, 50],
-  iconAnchor: [25, 50],
-  popupAnchor: [0, -48],
-});
+  {
+    id: "laboratory",
+    name: "Laboratory",
+    category: "Academic",
+    icon: "🧪",
+    type: "group",
+    children: [
+      { id: "mechanical", name: "Mechanical", icon: "⚙️" },
+      { id: "eee", name: "EEE", icon: "⚡" },
+      { id: "ece", name: "ECE", icon: "📡" },
+      { id: "chemistry", name: "Chemistry", icon: "🧪" },
+      { id: "polymer", name: "Polymer", icon: "🔬" },
+      { id: "physics", name: "Physics", icon: "⚛️" },
+    ],
+  },
 
-const issueIcon = (status, priority) => {
-  let color = "#ef4444";
+  {
+    id: "department-a",
+    name: "Department Block A",
+    category: "Academic",
+    icon: "🏢",
+    type: "group",
+    children: [
+      { id: "cse", name: "CSE", icon: "💻" },
+      { id: "it", name: "IT", icon: "💻" },
+      { id: "ece-dept", name: "ECE", icon: "📡" },
+      { id: "ads", name: "ADS", icon: "🤖" },
+      { id: "eee-dept", name: "EEE", icon: "⚡" },
+    ],
+  },
 
-  if (status === "In Progress") {
-    color = "#f59e0b";
-  }
+  {
+    id: "department-b",
+    name: "Department Block B",
+    category: "Academic",
+    icon: "🏢",
+    type: "group",
+    children: [
+      { id: "mech", name: "MECH", icon: "⚙️" },
+      { id: "civil", name: "CIVIL", icon: "🏗️" },
+      { id: "mert", name: "METR", icon: "🔩" },
+    ],
+  },
 
-  if (status === "Resolved") {
-    color = "#22c55e";
-  }
+  {
+    id: "canteen",
+    name: "Canteen",
+    category: "Food",
+    icon: "🍴",
+    type: "place",
+  },
 
-  const size = priority === "High" ? 22 : 18;
+  {
+    id: "stadium",
+    name: "Stadium",
+    category: "Sports",
+    icon: "🏟️",
+    type: "place",
+  },
 
-  return L.divIcon({
-    className: "issue-map-marker",
+  {
+    id: "boys-hostel",
+    name: "Boys Hostel",
+    category: "Hostel",
+    icon: "🛏️",
+    type: "place",
+  },
 
-    html: `
-      <div
-        class="issue-marker-dot"
-        style="
-          width: ${size}px;
-          height: ${size}px;
-          background: ${color};
-        "
-      >
-        <span>!</span>
-      </div>
-    `,
+  {
+    id: "girls-hostel",
+    name: "Girls Hostel",
+    category: "Hostel",
+    icon: "🛏️",
+    type: "place",
+  },
 
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-  });
-};
+  {
+    id: "temple",
+    name: "Temple",
+    category: "Campus",
+    icon: "🛕",
+    type: "place",
+  },
 
-const placeIcon = (emoji) => {
-  return L.divIcon({
-    className: "campus-place-marker",
+  {
+    id: "parents-paradise",
+    name: "Parents Paradise",
+    category: "Campus",
+    icon: "🌳",
+    type: "place",
+  },
+];
 
-    html: `
-      <div class="place-marker">
-        <span>${emoji}</span>
-      </div>
-    `,
-
-    iconSize: [42, 42],
-    iconAnchor: [21, 21],
-  });
-};
-
-function MapFocus({ location, userLocation }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (location) {
-      map.flyTo(location, 18, {
-        duration: 1.2,
-      });
-    }
-  }, [location, map]);
-
-  useEffect(() => {
-    if (userLocation) {
-      map.flyTo(userLocation, 18, {
-        duration: 1.2,
-      });
-    }
-  }, [userLocation, map]);
-
-  return null;
-}
-
-function CampusMap() {
+function AdminExploreCampus() {
   const navigate = useNavigate();
 
-  const [issues, setIssues] = useState([]);
-  const [loadingIssues, setLoadingIssues] = useState(true);
-
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [selectedChild, setSelectedChild] = useState(null);
 
-  const [userLocation, setUserLocation] = useState(null);
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [selectedPlacePhotos, setSelectedPlacePhotos] = useState(null);
-  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
-  const [selectedDepartmentBlock, setSelectedDepartmentBlock] = useState(null);
-const [selectedDepartment, setSelectedDepartment] = useState(null);
-const [selectedLaboratory, setSelectedLaboratory] = useState(null);
-  useEffect(() => {
-  if (
-    !selectedPlacePhotos ||
-    !selectedPlacePhotos.photos ||
-    selectedPlacePhotos.photos.length <= 1
-  ) {
-    return;
-  }
-
-  const slideshow = setInterval(() => {
-    setActivePhotoIndex((prev) => {
-      const total = selectedPlacePhotos.photos.length;
-
-      return prev === total - 1 ? 0 : prev + 1;
-    });
-  }, 4000);
-
-  return () => clearInterval(slideshow);
-}, [selectedPlacePhotos]);
-
-  const locationCoordinates = {
-    "Boys Hostel": [9.6710556, 77.9639999],
-    Stadium: [9.6727778, 77.9634722],
-    "Main Block": [9.6728333, 77.9653611],
-    "Girls Hostel": [9.67425, 77.9638889],
-    Laboratory: [9.6728333, 77.9645],
-    Departments: [9.6735833, 77.9646111],
-  };
-const departmentBlocks = [
-  {
-    id: "block-a",
-    name: "Department Block A",
-    departments: [
-      {
-  id: "cse",
-  name: "Computer Science & Engineering",
-  shortName: "CSE",
-  icon: "💻",
- photos: [],
-},
-      {
-        id: "it",
-        name: "Information Technology",
-        shortName: "IT",
-        icon: "🖥️",
-        photos: []
-      },
-      {
-  id: "ece",
-  name: "Electronics & Communication Engineering",
-  shortName: "ECE",
-  icon: "📡",
-  photos: [
-    "/campus/ece-1.jpg",
-    "/campus/ece-2.jpg"
-  ]
-},
-      {
-        id: "ads",
-        name: "Artificial Intelligence & Data Science",
-        shortName: "AI & DS",
-        icon: "🤖",
-        photos: []
-      },
-      {
-        id: "eee",
-        name: "Electrical & Electronics Engineering",
-        shortName: "EEE",
-        icon: "⚡",
-        photos: []
-      }
-    ]
-  },
-
-  {
-    id: "block-b",
-    name: "Department Block B",
-    departments: [
-      {
-        id: "mech",
-        name: "Mechanical Engineering",
-        shortName: "Mech",
-        icon: "⚙️",
-        photos: []
-      },
-      {
-        id: "civil",
-        name: "Civil Engineering",
-        shortName: "Civil",
-        icon: "🏗️",
-        photos: []
-      },
-      {
-        id: "metr",
-        name: "Metallurgical Engineering",
-        shortName: "METR",
-        icon: "🔩",
-        photos: []
-      }
-    ]
-  }
-];
-const laboratoryList = [
- {
-  id: "mechanical",
-  name: "Mechanical Laboratory",
-  shortName: "Mechanical",
-  icon: "⚙️",
-  photos: [
-    "/campus/mechanical-lab-1.jpg",
-    "/campus/mechanical-lab-2.jpg"
-  ]
-},
-  {
-    id: "eee",
-    name: "EEE Laboratory",
-    shortName: "EEE",
-    icon: "⚡",
-    photos: []
-  },
-  {
-    id: "ece",
-    name: "ECE Laboratory",
-    shortName: "ECE",
-    icon: "📡",
-    photos: []
-  },
-  {
-    id: "chemistry",
-    name: "Chemistry Laboratory",
-    shortName: "Chemistry",
-    icon: "🧪",
-    photos: []
-  },
-  {
-    id: "polymer",
-    name: "Polymer Laboratory",
-    shortName: "Polymer",
-    icon: "🔬",
-    photos: []
-  },
-  {
-  id: "physics",
-  name: "Physics Laboratory",
-  shortName: "Physics",
-  icon: "⚛️",
-  photos: [
-    "/campus/physics-1.jpg",
-    "/campus/physics-2.jpg"
-  ]
-}
-];
-  const campusPlaces = [
-    {
-      id: 1,
-      name: "Boys Hostel",
-      category: "Hostel",
-      icon: "🏠",
-      position: [9.6710556, 77.9639999],
-    },
-    {
-      id: 2,
-      name: "Stadium",
-      category: "Sports",
-      icon: "🏟️",
-      position: [9.6727778, 77.9634722],
-    },
-   {
-  id: 3,
-  name: "Main Block",
-  category: "Academic",
-  icon: "🏫",
-  position: [9.6728333, 77.9653611],
-
-  description:
-    "The main academic block of the campus.",
-    
-  photos: [
-    "https://images.unsplash.com/photo-1562774053-701939374585?w=1200",
-    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200"
-  ],
-},
-    {
-      id: 4,
-      name: "Girls Hostel",
-      category: "Hostel",
-      icon: "🏠",
-      position: [9.67425, 77.9638889],
-    },
-    {
-      id: 5,
-      name: "Laboratory",
-      category: "Academic",
-      icon: "🧪",
-      position: [9.6728333, 77.9645],
-    },
-    {
-      id: 6,
-      name: "Departments_block-A",
-      category: "Academic",
-      icon: "🏢",
-      position: [9.6735833, 77.9646111],
-    },
-    {
-  id: 7,
-  name: "Temple",
-  category: "Spiritual",
-  icon: "🛕",
-  position: [9.6724722, 77.9659722],
-},
-{
-  id: 8,
-  name: "Parents Paradise",
-  category: "Recreation",
-  icon: "🌴",
-  position: [9.6734167, 77.96575],
-},
-{
-  id: 9,
-  name: "Canteen",
-  category: "Food",
-  icon: "🍴",
-  position: [9.6724444, 77.9640833],
-},
-{
-  id: 10,
-  name: "Departments_block-B",
-  category: "Academic",
-  icon: "🏢",
-  position: [9.6718889, 77.9645],
-},
-  ];
-
-  const campusBounds = campusPlaces.map(
-    (place) => place.position
-  );
-
-  useEffect(() => {
-    const fetchIssues = async () => {
-      const { data, error } = await supabase
-        .from("issues")
-        .select(
-          "id, title, description, category, priority, location, status, created_at"
-        )
-        .order("created_at", {
-          ascending: false,
-        });
-
-      if (error) {
-        console.log("ISSUES ERROR:", error);
-        setLoadingIssues(false);
-        return;
-      }
-
-      setIssues(data || []);
-      setLoadingIssues(false);
-    };
-
-    fetchIssues();
-  }, []);
-
-  const getMyLocation = () => {
-    if (!navigator.geolocation) {
-      alert(
-        "Location is not supported by this browser."
-      );
-      return;
-    }
-
-    setLocationLoading(true);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = [
-          position.coords.latitude,
-          position.coords.longitude,
-        ];
-
-        setUserLocation(coords);
-        setLocationLoading(false);
-      },
-      (error) => {
-        console.log("LOCATION ERROR:", error);
-
-        setLocationLoading(false);
-
-        alert(
-          "Unable to get your location. Please allow location permission."
-        );
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
+  const handlePlaceClick = (place) => {
+    setSelectedPlace(place);
+    setSelectedChild(null);
   };
 
-  const filteredPlaces = campusPlaces.filter(
-    (place) => {
-      const matchesCategory =
-        activeCategory === "All" ||
-        place.category === activeCategory;
-
-      const matchesSearch =
-        place.name
-          .toLowerCase()
-          .includes(
-            searchTerm.toLowerCase()
-          );
-
-      return (
-        matchesCategory &&
-        matchesSearch
-      );
-    }
-  );
+  const handleChildClick = (child) => {
+    setSelectedChild(child);
+  };
 
   return (
-    <div className="campus-explorer">
+    <div className="admin-explore-page">
 
-      {/* MAP */}
+      {/* HEADER */}
 
-      <MapContainer
-        bounds={campusBounds}
-        boundsOptions={{
-          padding: [50, 50],
-        }}
-        zoomControl={false}
-        className="campus-leaflet-map"
-      >
+      <header className="admin-explore-header">
 
-        <MapFocus
-          location={selectedPlace}
-          userLocation={userLocation}
-        />
-
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        <ZoomControl position="bottomright" />
-
-        {/* USER LOCATION */}
-
-        {userLocation && (
-          <CircleMarker
-            center={userLocation}
-            radius={8}
-            pathOptions={{
-              color: "#ffffff",
-              fillColor: "#2563eb",
-              fillOpacity: 1,
-              weight: 3,
-            }}
-          >
-            <Popup>
-              <strong>You are here</strong>
-            </Popup>
-          </CircleMarker>
-        )}
-
-        {/* CAMPUS PLACES */}
-
-        {filteredPlaces.map((place) => (
-          <Marker
-            key={place.id}
-            position={place.position}
-            icon={placeIcon(place.icon)}
-            eventHandlers={{
-              click: () =>
-                setSelectedPlace(
-                  place.position
-                ),
-            }}
-          >
-            <Popup>
-  <div className="place-popup">
-
-    <div className="place-popup-icon">
-      {place.icon}
-    </div>
-
-    <div className="place-popup-content">
-      <strong>
-        {place.name}
-      </strong>
-
-      <span>
-        {place.category}
-      </span>
-<button
-  className="view-photos-btn"
-  onClick={() => {
-
-    if (place.name === "Departments_block-A") {
-
-      setSelectedDepartmentBlock(
-        departmentBlocks.find(
-          (block) => block.id === "block-a"
-        )
-      );
-
-      setSelectedDepartment(null);
-      setSelectedPlacePhotos(place);
-      setActivePhotoIndex(0);
-
-    } else if (place.name === "Departments_block-B") {
-
-      setSelectedDepartmentBlock(
-        departmentBlocks.find(
-          (block) => block.id === "block-b"
-        )
-      );
-
-      setSelectedDepartment(null);
-      setSelectedPlacePhotos(place);
-      setActivePhotoIndex(0);
-
-    } else if (place.name === "Laboratory") {
-
-      setSelectedDepartmentBlock(null);
-      setSelectedDepartment(null);
-      setSelectedPlacePhotos(place);
-      setActivePhotoIndex(0);
-
-    } else {
-
-      setSelectedDepartmentBlock(null);
-      setSelectedDepartment(null);
-      setSelectedPlacePhotos(place);
-      setActivePhotoIndex(0);
-
-    }
-
-  }}
->
-  📸 View Photos
-</button>
-    </div>
-
-  </div>
-</Popup>
-          </Marker>
-        ))}
-
-        {/* CAMPUS MAIN MARKER */}
-
-        <Marker
-          position={[
-            9.6728,
-            77.9659,
-          ]}
-          icon={campusIcon}
-        >
-          <Popup>
-            <div className="campus-popup">
-
-              <div className="popup-icon">
-                🏫
-              </div>
-
-              <div>
-                <strong>
-                  Kamaraj College of Engineering
-                  & Technology
-                </strong>
-
-                <span>
-                  S.P.G.C. Nagar,
-                  K. Vellakulam
-                </span>
-
-                <small>
-                  Near Virudhunagar,
-                  Tamil Nadu
-                </small>
-              </div>
-
-            </div>
-          </Popup>
-        </Marker>
-
-        {/* ISSUE MARKERS */}
-
-        {!loadingIssues &&
-          issues.map((issue) => {
-            const position =
-              locationCoordinates[
-                issue.location
-              ];
-
-            if (!position) {
-              return null;
-            }
-
-            return (
-              <Marker
-                key={issue.id}
-                position={position}
-                icon={issueIcon(
-                  issue.status,
-                  issue.priority
-                )}
-              >
-                <Popup>
-                  <div className="campus-popup">
-
-                    <div className="popup-icon">
-                      {issue.status ===
-                      "Resolved"
-                        ? "🟢"
-                        : issue.status ===
-                          "In Progress"
-                        ? "🟠"
-                        : "🔴"}
-                    </div>
-
-                    <div>
-                      <strong>
-                        {issue.title}
-                      </strong>
-
-                      <span>
-                        {issue.location}
-                      </span>
-
-                      <small>
-                        Status:{" "}
-                        {issue.status}
-                      </small>
-
-                      <small>
-                        Priority:{" "}
-                        {issue.priority}
-                      </small>
-                    </div>
-
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-
-      </MapContainer>
-
-      {/* TOP BAR */}
-
-      <div className="map-topbar">
-
-        <Link
-          to="/"
-          className="map-brand"
-        >
-          <div className="map-brand-icon">
-            CP
-          </div>
-
-          <span>
-            Campus<span>Pulse</span>
-          </span>
-        </Link>
-
-        <div className="map-search">
-
-          <span>⌕</span>
-
-          <input
-            type="text"
-            placeholder="Search campus locations..."
-            value={searchTerm}
-            onChange={(e) =>
-              setSearchTerm(
-                e.target.value
-              )
-            }
-          />
-
-          <kbd>⌘ K</kbd>
-
-        </div>
-
-      </div>
-
-      {/* BACK BUTTON */}
-
-      <button
-        className="map-back-button"
-        onClick={() => navigate("/")}
-      >
-        <span>←</span>
-        Back
-      </button>
-
-      {/* LEFT FLOATING PANEL */}
-
-      <aside className="map-control-panel">
-
-        <div className="map-panel-header">
-
-          <div>
-
-            <span className="map-eyebrow">
-              EXPLORE CAMPUS
-            </span>
-
-            <h1>
-              Campus Map
-            </h1>
-
-            <p>
-              Discover campus
-              locations and facilities.
-            </p>
-
-          </div>
-
-          <div className="live-indicator">
-            <span></span>
-            LIVE
-          </div>
-
-        </div>
-
-        {/* CATEGORY FILTER */}
-
-        <div className="map-category-filter">
-
-          <div className="filter-title">
-            Explore
-          </div>
-
-          <div className="filter-buttons">
-
-            {[
-  "All",
-  "Academic",
-  "Hostel",
-  "Sports",
-  "Food",
-  "Spiritual",
-  "Recreation",
-].map((category) => (
-              <button
-                key={category}
-                className={
-                  activeCategory ===
-                  category
-                    ? "active"
-                    : ""
-                }
-                onClick={() =>
-                  setActiveCategory(
-                    category
-                  )
-                }
-              >
-                {category}
-              </button>
-            ))}
-
-          </div>
-
-        </div>
-
-        {/* MY LOCATION */}
-
-        <div className="map-actions">
+        <div>
 
           <button
-            className="map-location-btn"
-            onClick={getMyLocation}
-            disabled={locationLoading}
+            className="admin-back-btn"
+            onClick={() => navigate("/admin")}
           >
-            {locationLoading
-              ? "⏳"
-              : "📍"}
+            ← Back to Dashboard
+          </button>
+
+          <div className="admin-explore-title">
+
+            <span>🗺️</span>
+
+            <div>
+              <h1>Explore Campus</h1>
+
+              <p>
+                Manage campus locations and their photos.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div className="admin-live-status">
+          <span></span>
+          Campus Explorer
+        </div>
+
+      </header>
+
+
+      {/* MAIN CONTENT */}
+
+      <main className="admin-explore-content">
+
+        {/* LEFT SIDE */}
+
+        <section className="admin-place-panel">
+
+          <div className="panel-heading">
+
+            <div>
+              <h2>Campus Places</h2>
+
+              <p>
+                Select a location to manage
+              </p>
+            </div>
 
             <span>
-              {locationLoading
-                ? "Locating..."
-                : "My Location"}
+              {campusPlaces.length} Places
             </span>
-          </button>
-
-        </div>
-
-        {/* CAMPUS INFO */}
-
-        <div className="campus-info-card">
-
-          <div className="info-card-top">
-
-            <span>📍</span>
-
-            <div>
-              <strong>
-                KCET Campus
-              </strong>
-
-              <small>
-                Virudhunagar,
-                Tamil Nadu
-              </small>
-            </div>
 
           </div>
 
-          <div className="info-divider"></div>
 
-          <div className="info-stats">
+          <div className="admin-place-list">
 
-            <div>
-              <strong>
-                Campus
-              </strong>
-
-              <span>
-                Explore
-              </span>
-            </div>
-
-            <div>
-              <strong>
-                Map
-              </strong>
-
-              <span>
-                Live
-              </span>
-            </div>
-
-          </div>
-
-        </div>
-
-      </aside>
-{selectedPlacePhotos && (
-  <div
-    className="place-photo-modal"
-   onClick={() => {
-  setSelectedPlacePhotos(null);
-  setSelectedDepartmentBlock(null);
-  setSelectedDepartment(null);
-  setSelectedLaboratory(null);
-  setActivePhotoIndex(0);
-}}
-  >
-    <div
-      className="place-photo-modal-content"
-      onClick={(e) =>
-        e.stopPropagation()
-      }
-    >
-      <button
-        className="photo-modal-close"
-        onClick={() =>
-          setSelectedPlacePhotos(null)
-        }
-      >
-        ✕
-      </button>
-
- <div className="photo-gallery">
-
-  {/* ================= DEPARTMENT SELECTOR ================= */}
-
-  {selectedDepartmentBlock && !selectedDepartment && (
-    <div className="department-selector">
-
-      <div className="department-selector-header">
-        <span>DEPARTMENTS</span>
-
-        <h2>
-          {selectedDepartmentBlock.name}
-        </h2>
-
-        <p>
-          Select a department to view its photos.
-        </p>
-      </div>
-
-      <div className="department-grid">
-
-        {selectedDepartmentBlock.departments.map((dept) => (
-
-          <button
-            key={dept.id}
-            className="department-card"
-            onClick={() => {
-              setSelectedDepartment(dept);
-              setActivePhotoIndex(0);
-            }}
-          >
-
-            <div className="department-card-icon">
-              {dept.icon}
-            </div>
-
-            <div className="department-card-info">
-
-              <strong>
-                {dept.shortName}
-              </strong>
-
-              <small>
-                {dept.name}
-              </small>
-
-            </div>
-
-            <span>→</span>
-
-          </button>
-
-        ))}
-
-      </div>
-
-    </div>
-  )}
-
-
-  {/* ================= LABORATORY SELECTOR ================= */}
-
-  {!selectedDepartmentBlock &&
-    !selectedLaboratory &&
-    selectedPlacePhotos?.name === "Laboratory" && (
-
-    <div className="department-selector">
-
-      <div className="department-selector-header">
-        <span>LABORATORIES</span>
-
-        <h2>
-          Campus Laboratories
-        </h2>
-
-        <p>
-          Select a laboratory to view its photos.
-        </p>
-      </div>
-
-      <div className="department-grid">
-
-        {laboratoryList.map((lab) => (
-
-          <button
-            key={lab.id}
-            className="department-card"
-            onClick={() => {
-              setSelectedLaboratory(lab);
-              setActivePhotoIndex(0);
-            }}
-          >
-
-            <div className="department-card-icon">
-              {lab.icon}
-            </div>
-
-            <div className="department-card-info">
-
-              <strong>
-                {lab.shortName}
-              </strong>
-
-              <small>
-                {lab.name}
-              </small>
-
-            </div>
-
-            <span>→</span>
-
-          </button>
-
-        ))}
-
-      </div>
-
-    </div>
-  )}
-
-
-  {/* ================= PHOTO GALLERY ================= */}
-
-  {(
-    selectedDepartment?.photos?.length > 0 ||
-    selectedLaboratory?.photos?.length > 0 ||
-    (
-      !selectedDepartmentBlock &&
-      !selectedLaboratory &&
-      selectedPlacePhotos?.photos?.length > 0
-    )
-  ) && (
-
-    <>
-
-      <img
-        key={activePhotoIndex}
-        src={
-          selectedDepartment
-            ? selectedDepartment.photos[activePhotoIndex]
-            : selectedLaboratory
-            ? selectedLaboratory.photos[activePhotoIndex]
-            : selectedPlacePhotos.photos[activePhotoIndex]
-        }
-        alt={
-          selectedDepartment?.name ||
-          selectedLaboratory?.name ||
-          selectedPlacePhotos?.name
-        }
-        className="photo-gallery-image"
-      />
-
-      <div className="photo-place-overlay">
-
-        <div className="photo-place-overlay-category">
-          {selectedDepartment
-            ? "DEPARTMENT"
-            : selectedLaboratory
-            ? "LABORATORY"
-            : selectedPlacePhotos.category}
-        </div>
-
-        <div className="photo-place-overlay-name">
-          {selectedDepartment?.name ||
-            selectedLaboratory?.name ||
-            selectedPlacePhotos.name}
-        </div>
-
-      </div>
-
-
-      {/* PREVIOUS */}
-
-      {(
-        selectedDepartment?.photos?.length ||
-        selectedLaboratory?.photos?.length ||
-        selectedPlacePhotos?.photos?.length
-      ) > 1 && (
-
-        <>
-
-          <button
-            className="photo-nav photo-prev"
-            onClick={() =>
-              setActivePhotoIndex((prev) => {
-
-                const photos =
-                  selectedDepartment?.photos ||
-                  selectedLaboratory?.photos ||
-                  selectedPlacePhotos.photos;
-
-                return prev === 0
-                  ? photos.length - 1
-                  : prev - 1;
-
-              })
-            }
-          >
-            ‹
-          </button>
-
-
-          {/* NEXT */}
-
-          <button
-            className="photo-nav photo-next"
-            onClick={() =>
-              setActivePhotoIndex((prev) => {
-
-                const photos =
-                  selectedDepartment?.photos ||
-                  selectedLaboratory?.photos ||
-                  selectedPlacePhotos.photos;
-
-                return prev === photos.length - 1
-                  ? 0
-                  : prev + 1;
-
-              })
-            }
-          >
-            ›
-          </button>
-
-
-          {/* COUNTER */}
-
-          <div className="photo-counter">
-
-            {activePhotoIndex + 1} /{" "}
-
-            {
-              (
-                selectedDepartment?.photos ||
-                selectedLaboratory?.photos ||
-                selectedPlacePhotos.photos
-              ).length
-            }
-
-          </div>
-
-
-          {/* THUMBNAILS */}
-
-          <div className="photo-thumbnails">
-
-            {(
-              selectedDepartment?.photos ||
-              selectedLaboratory?.photos ||
-              selectedPlacePhotos.photos
-            ).map((photo, index) => (
+            {campusPlaces.map((place) => (
 
               <button
-                key={index}
-                className={`photo-thumbnail ${
-                  activePhotoIndex === index
+                key={place.id}
+                className={`admin-place-card ${
+                  selectedPlace?.id === place.id
                     ? "active"
                     : ""
                 }`}
-                onClick={() =>
-                  setActivePhotoIndex(index)
-                }
+                onClick={() => handlePlaceClick(place)}
               >
 
-                <img
-                  src={photo}
-                  alt={`Photo ${index + 1}`}
-                />
+                <div className="place-card-icon">
+                  {place.icon}
+                </div>
+
+                <div className="place-card-info">
+
+                  <strong>
+                    {place.name}
+                  </strong>
+
+                  <small>
+                    {place.category}
+                  </small>
+
+                </div>
+
+                <span className="place-card-arrow">
+                  →
+                </span>
 
               </button>
 
@@ -1154,47 +224,233 @@ const laboratoryList = [
 
           </div>
 
-        </>
-
-      )}
-
-    </>
-
-  )}
+        </section>
 
 
-  {/* ================= EMPTY ================= */}
+        {/* RIGHT SIDE */}
 
-  {!selectedDepartmentBlock &&
-    !selectedLaboratory &&
-    !selectedDepartment &&
-    !selectedPlacePhotos?.photos?.length && (
+        <section className="admin-photo-panel">
 
-    <div className="photo-no-image">
+          {!selectedPlace && (
 
-      <span>
-        {selectedPlacePhotos?.icon}
-      </span>
+            <div className="admin-photo-empty">
 
-      <strong>
-        No photos available
-      </strong>
+              <div className="empty-photo-icon">
+                🗺️
+              </div>
 
+              <h3>
+                Select a campus place
+              </h3>
+
+              <p>
+                Choose a location from the left to manage
+                its photos.
+              </p>
+
+            </div>
+
+          )}
+
+
+          {selectedPlace && (
+
+            <>
+
+              {/* PLACE HEADER */}
+
+              <div className="photo-panel-header">
+
+                <div>
+
+                  <span>
+                    {selectedPlace.category}
+                  </span>
+
+                  <h2>
+                    {selectedPlace.icon}{" "}
+                    {selectedPlace.name}
+                  </h2>
+
+                  <p>
+                    Manage photos displayed in Campus
+                    Explorer.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              {/* SUB CATEGORIES */}
+
+              {selectedPlace.type === "group" && (
+
+                <div className="subcategory-section">
+
+                  <div className="subcategory-heading">
+
+                    <h3>
+                      Select Category
+                    </h3>
+
+                    <p>
+                      Choose an individual location
+                      to manage its photos.
+                    </p>
+
+                  </div>
+
+
+                  <div className="subcategory-grid">
+
+                    {selectedPlace.children.map(
+                      (child) => (
+
+                        <button
+                          key={child.id}
+                          className={`subcategory-card ${
+                            selectedChild?.id === child.id
+                              ? "selected"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            handleChildClick(child)
+                          }
+                        >
+
+                          <span className="subcategory-icon">
+                            {child.icon}
+                          </span>
+
+                          <span className="subcategory-name">
+                            {child.name}
+                          </span>
+
+                          <span className="subcategory-arrow">
+                            →
+                          </span>
+
+                        </button>
+
+                      )
+                    )}
+
+                  </div>
+
+                </div>
+
+              )}
+              {selectedPlace.type === "group" && (
+  <div className="subcategory-section">
+
+    <div className="subcategory-heading">
+      <h3>Select Department</h3>
       <p>
-        Photos will be added soon.
+        Choose a department to view and manage its photos.
       </p>
+    </div>
+
+    <div className="subcategory-grid">
+
+      {selectedPlace.children.map((child) => (
+        <button
+          key={child.id}
+          className={`subcategory-card ${
+            selectedChild?.id === child.id ? "selected" : ""
+          }`}
+          onClick={() => setSelectedChild(child)}
+        >
+
+          <div className="subcategory-icon">
+            {child.icon}
+          </div>
+
+          <div className="subcategory-info">
+            <strong>{child.name}</strong>
+            <span>View Photos →</span>
+          </div>
+
+        </button>
+      ))}
 
     </div>
 
-  )}
-
-</div>
-
-    </div>
   </div>
 )}
+
+
+              {/* PHOTO AREA */}
+
+              {(selectedPlace.type === "place" ||
+                selectedChild) && (
+
+                <div className="photo-management-area">
+
+                  <div className="photo-selected-info">
+
+                    <div>
+
+                      <span>
+                        {selectedChild
+                          ? selectedPlace.name
+                          : selectedPlace.category}
+                      </span>
+
+                      <h3>
+                        {selectedChild
+                          ? `${selectedChild.icon} ${selectedChild.name}`
+                          : `${selectedPlace.icon} ${selectedPlace.name}`}
+                      </h3>
+
+                    </div>
+
+                    <span className="photo-count">
+                      0 Photos
+                    </span>
+
+                  </div>
+
+
+                  <div className="admin-photo-empty">
+
+                    <div className="empty-photo-icon">
+                      📸
+                    </div>
+
+                    <h3>
+                      No photos added yet
+                    </h3>
+
+                    <p>
+                      Add photos for this location.
+                    </p>
+
+                    <button
+                      className="add-photo-btn"
+                      onClick={() =>
+                        alert("Photo upload will be added next.")
+                      }
+                    >
+                      + Add Photo
+                    </button>
+
+                  </div>
+
+                </div>
+
+              )}
+
+            </>
+
+          )}
+
+        </section>
+
+      </main>
+
     </div>
   );
 }
 
-export default CampusMap;
+export default AdminExploreCampus;

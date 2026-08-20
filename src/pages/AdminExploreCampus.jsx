@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import toast from "react-hot-toast";
 import "../styles/admin-explore.css";
 
 const campusPlaces = [
@@ -10,59 +12,218 @@ const campusPlaces = [
     icon: "🏫",
   },
   {
-    id: 2,
-    name: "Laboratory",
-    category: "Academic",
-    icon: "🧪",
-  },
-  {
-    id: 3,
-    name: "Departments",
-    category: "Academic",
-    icon: "🏢",
-  },
-  {
-    id: 4,
-    name: "Canteen",
-    category: "Food",
-    icon: "🍴",
-  },
-  {
-    id: 5,
-    name: "Stadium",
-    category: "Sports",
-    icon: "🏟️",
-  },
-  {
-    id: 6,
-    name: "Boys Hostel",
-    category: "Hostel",
-    icon: "🛏️",
-  },
-  {
-    id: 7,
-    name: "Girls Hostel",
-    category: "Hostel",
-    icon: "🛏️",
-  },
-  {
-    id: 8,
-    name: "Temple",
-    category: "Campus",
-    icon: "🛕",
-  },
-  {
-    id: 9,
-    name: "Parents Paradise",
-    category: "Campus",
-    icon: "🌳",
-  },
+  id: 2,
+  name: "Laboratory",
+  category: "Academic",
+  icon: "🧪",
+  type: "laboratory",
+  laboratories: [
+    {
+      id: "mechanical",
+      name: "Mechanical Laboratory",
+      shortName: "Mechanical",
+      icon: "⚙️",
+    },
+    {
+      id: "eee",
+      name: "EEE Laboratory",
+      shortName: "EEE",
+      icon: "⚡",
+    },
+    {
+      id: "ece",
+      name: "ECE Laboratory",
+      shortName: "ECE",
+      icon: "📡",
+    },
+    {
+      id: "chemistry",
+      name: "Chemistry Laboratory",
+      shortName: "Chemistry",
+      icon: "🧪",
+    },
+    {
+      id: "polymer",
+      name: "Polymer Laboratory",
+      shortName: "Polymer",
+      icon: "🔬",
+    },
+    {
+      id: "physics",
+      name: "Physics Laboratory",
+      shortName: "Physics",
+      icon: "⚛️",
+    },
+  ],
+},
+{
+  id: 3,
+  name: "Department Block A",
+  category: "Academic",
+  icon: "🏢",
+  type: "department-block",
+  departments: [
+    {
+      id: "cse",
+      name: "Computer Science & Engineering",
+      shortName: "CSE",
+      icon: "💻",
+    },
+    {
+      id: "it",
+      name: "Information Technology",
+      shortName: "IT",
+      icon: "💻",
+    },
+    {
+      id: "ece",
+      name: "Electronics & Communication Engineering",
+      shortName: "ECE",
+      icon: "📡",
+    },
+    {
+      id: "ads",
+      name: "Artificial Intelligence & Data Science",
+      shortName: "ADS",
+      icon: "🤖",
+    },
+    {
+      id: "eee",
+      name: "Electrical & Electronics Engineering",
+      shortName: "EEE",
+      icon: "⚡",
+    },
+  ],
+},
+{
+  id: 4,
+  name: "Department Block B",
+  category: "Academic",
+  icon: "🏢",
+  type: "department-block",
+  departments: [
+    {
+      id: "mech",
+      name: "Mechanical Engineering",
+      shortName: "MECH",
+      icon: "⚙️",
+    },
+    {
+      id: "civil",
+      name: "Civil Engineering",
+      shortName: "CIVIL",
+      icon: "🏗️",
+    },
+    {
+      id: "mert",
+      name: "Metallurgical Engineering",
+      shortName: "MERT",
+      icon: "🔩",
+    },
+  ],
+},
+ {
+  id: 5,
+  name: "Canteen",
+  category: "Food",
+  icon: "🍴",
+},
+{
+  id: 6,
+  name: "Stadium",
+  category: "Sports",
+  icon: "🏟️",
+},
+{
+  id: 7,
+  name: "Boys Hostel",
+  category: "Hostel",
+  icon: "🛏️",
+},
+{
+  id: 8,
+  name: "Girls Hostel",
+  category: "Hostel",
+  icon: "🛏️",
+},
+{
+  id: 9,
+  name: "Temple",
+  category: "Campus",
+  icon: "🛕",
+},
+{
+  id: 10,
+  name: "Parents Paradise",
+  category: "Campus",
+  icon: "🌳",
+}
 ];
 
 function AdminExploreCampus() {
   const navigate = useNavigate();
 
   const [selectedPlace, setSelectedPlace] = useState(campusPlaces[0]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a photo first");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const fileExt = selectedFile.name.split(".").pop();
+
+      const fileName = `${selectedPlace.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")}-${Date.now()}.${fileExt}`;
+
+      const filePath = `campus/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("campus-photos")
+        .upload(filePath, selectedFile);
+
+      if (uploadError) {
+        console.log("Upload error:", uploadError);
+        toast.error("Photo upload failed");
+        return;
+      }
+
+      const { data } = supabase.storage
+        .from("campus-photos")
+        .getPublicUrl(filePath);
+
+      console.log("Uploaded photo URL:", data.publicUrl);
+
+      toast.success("Photo uploaded successfully!");
+
+      setSelectedFile(null);
+
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="admin-explore-page">
@@ -72,6 +233,7 @@ function AdminExploreCampus() {
       <header className="admin-explore-header">
 
         <div>
+
           <button
             className="admin-back-btn"
             onClick={() => navigate("/admin")}
@@ -80,6 +242,7 @@ function AdminExploreCampus() {
           </button>
 
           <div className="admin-explore-title">
+
             <span>🗺️</span>
 
             <div>
@@ -89,7 +252,9 @@ function AdminExploreCampus() {
                 Manage campus locations and their photos.
               </p>
             </div>
+
           </div>
+
         </div>
 
         <div className="admin-live-status">
@@ -109,6 +274,7 @@ function AdminExploreCampus() {
         <section className="admin-place-panel">
 
           <div className="panel-heading">
+
             <div>
               <h2>Campus Places</h2>
 
@@ -120,6 +286,7 @@ function AdminExploreCampus() {
             <span>
               {campusPlaces.length} Places
             </span>
+
           </div>
 
 
@@ -134,7 +301,10 @@ function AdminExploreCampus() {
                     ? "active"
                     : ""
                 }`}
-                onClick={() => setSelectedPlace(place)}
+                onClick={() => {
+                  setSelectedPlace(place);
+                  setSelectedFile(null);
+                }}
               >
 
                 <div className="place-card-icon">
@@ -142,6 +312,7 @@ function AdminExploreCampus() {
                 </div>
 
                 <div className="place-card-info">
+
                   <strong>
                     {place.name}
                   </strong>
@@ -149,6 +320,7 @@ function AdminExploreCampus() {
                   <small>
                     {place.category}
                   </small>
+
                 </div>
 
                 <span className="place-card-arrow">
@@ -171,6 +343,7 @@ function AdminExploreCampus() {
           <div className="photo-panel-header">
 
             <div>
+
               <span>
                 {selectedPlace.category}
               </span>
@@ -183,6 +356,7 @@ function AdminExploreCampus() {
               <p>
                 Manage photos displayed in Campus Explorer.
               </p>
+
             </div>
 
             <div className="photo-count">
@@ -192,7 +366,7 @@ function AdminExploreCampus() {
           </div>
 
 
-          {/* EMPTY PHOTO STATE */}
+          {/* UPLOAD AREA */}
 
           <div className="admin-photo-empty">
 
@@ -201,17 +375,52 @@ function AdminExploreCampus() {
             </div>
 
             <h3>
-              No photos added yet
+              Add a photo
             </h3>
 
             <p>
-              Add photos of {selectedPlace.name} to
-              display them in the student Campus Explorer.
+              Upload a photo of {selectedPlace.name}.
             </p>
 
-            <button className="add-photo-btn">
-              + Add Photo
-            </button>
+
+            <label className="add-photo-btn">
+
+              + Choose Photo
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                hidden
+              />
+
+            </label>
+
+
+            {selectedFile && (
+
+              <div className="selected-file">
+
+                <p>
+                  Selected:
+                  <strong>
+                    {" "}{selectedFile.name}
+                  </strong>
+                </p>
+
+                <button
+                  className="upload-photo-btn"
+                  onClick={handleUpload}
+                  disabled={uploading}
+                >
+                  {uploading
+                    ? "Uploading..."
+                    : "Upload Photo"}
+                </button>
+
+              </div>
+
+            )}
 
           </div>
 
